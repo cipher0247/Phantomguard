@@ -14,6 +14,8 @@ npm run dev                     # web http://localhost:5173, API :8787
 Production: `npm run build && NODE_ENV=production npm start` (serves `dist/` and the API on :8787; put HTTPS in front).
 Tests: `npm test`. Type-check + build: `npm run build`.
 
+**Android demo:** see [docs/ANDROID_DEMO.md](docs/ANDROID_DEMO.md) (APK build, phone-to-PC connection, demo script).
+
 ## What is real vs. awaiting configuration
 
 | Feature | State |
@@ -48,7 +50,8 @@ Video frame extraction, audio decoding and duration enforcement belong in your m
 - [ ] Remove dev/test accounts: `npm run delete-user -- <email>` (also deletes their sessions and scans). To wipe local data entirely, stop the server and delete `data/`.
 - [ ] Rotate any API key that was ever pasted into a terminal, chat or screenshot.
 - [ ] Model weights, datasets and predictions live outside the repo (or in git-ignored paths) and are served by a separate inference service.
-- [ ] `npm audit` reports build-time-only advisories in Tailwind 3's dependency tree (braces/chokidar). They are not in the runtime server or the shipped bundle; fixing them means a Tailwind 4 migration.
+- [ ] `npm audit`: Tailwind was upgraded to v4, which removed the vulnerable braces/chokidar chain. Remaining advisories (uuid/xcode) are in the Capacitor CLI build tool only, not in the server or app.
+- [ ] Native clients authenticate with a Bearer token kept in the app's local storage; for stronger protection store it in Android Keystore-backed storage (plugin) before real-world use.
 
 ## Privacy
 

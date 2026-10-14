@@ -52,7 +52,7 @@ export const RiskBadge = ({ risk, children }: { risk: Risk; children: ReactNode 
   <span className={`text-xs px-2 py-0.5 rounded font-label font-medium ${RISK_STYLE[risk]}`}>{children}</span>;
 
 export const Card = ({ children, className = '' }: { children: ReactNode; className?: string }) =>
-  <section className={`rounded-xl bg-surface-container-low border border-outline-variant/40 p-5 shadow-sm animate-fade-in ${className}`}>{children}</section>;
+  <section className={`rounded-xl bg-surface-container-low border border-outline-variant/40 ${/(^| )p-\d/.test(className) ? '' : 'p-5'} shadow-xs animate-fade-in ${className}`}>{children}</section>;
 
 export const Spinner = ({ label = 'Loading' }: { label?: string }) =>
   <div role="status" className="flex items-center gap-2 text-sm text-on-surface-variant py-6 justify-center"><Icon name="progress_activity" className="animate-spin" />{label}…</div>;

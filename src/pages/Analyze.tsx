@@ -81,7 +81,7 @@ export function Analyze() {
     <div role="tablist" aria-label="Scan type" className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-surface-container">
       {TABS.map(([k, label, icon]) => (
         <button key={k} role="tab" aria-selected={tab === k} onClick={() => select(k)}
-          className={`min-h-[44px] rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition ${tab === k ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant'}`}>
+          className={`min-h-[44px] rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition ${tab === k ? 'bg-surface-container-lowest text-primary shadow-xs' : 'text-on-surface-variant'}`}>
           <Icon name={icon} className="text-[20px]" />{label}</button>))}
     </div>
 

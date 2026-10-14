@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss" important; /* utilities must beat the unlayered Material Symbols stylesheet */
+@config "../tailwind.config.js";
 
 @layer base {
   html, body { margin: 0; background: #faf5ee; overflow-x: hidden; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
