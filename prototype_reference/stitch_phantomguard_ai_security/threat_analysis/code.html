@@ -1,0 +1,295 @@
+<!DOCTYPE html><html class="" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-tertiary-container": "#3a2020",
+          "inverse-primary": "#f0a878",
+          "primary-fixed-dim": "#f0a878",
+          "surface": "#faf5ee",
+          "inverse-on-surface": "#faf5ee",
+          "on-surface": "#3a302a",
+          "surface-bright": "#faf5ee",
+          "secondary": "#78706a",
+          "surface-container-low": "#f6f0e8",
+          "error": "#c0392b",
+          "surface-dim": "#dcd6cc",
+          "secondary-container": "#eae2da",
+          "surface-container-high": "#ece6dc",
+          "on-primary": "#ffffff",
+          "outline-variant": "#d8d0c8",
+          "on-surface-variant": "#605850",
+          "on-error-container": "#7a1a10",
+          "tertiary-fixed-dim": "#e8a0a0",
+          "outline": "#9a9088",
+          "primary": "#c2652a",
+          "tertiary": "#8c3c3c",
+          "on-secondary-fixed": "#2a2420",
+          "on-tertiary-fixed": "#2e1515",
+          "on-background": "#3a302a",
+          "primary-fixed": "#fbe8d8",
+          "on-secondary": "#ffffff",
+          "on-primary-fixed-variant": "#8a4518",
+          "surface-tint": "#c2652a",
+          "tertiary-fixed": "#fce0e0",
+          "background": "#faf5ee",
+          "surface-container-highest": "#e6e0d6",
+          "secondary-fixed-dim": "#cec6be",
+          "surface-container-lowest": "#ffffff",
+          "error-container": "#fce4e0",
+          "surface-variant": "#ece6dc",
+          "surface-container": "#f2ece4",
+          "primary-container": "#e08850",
+          "on-primary-container": "#fbe8d8",
+          "tertiary-container": "#d47070",
+          "on-secondary-fixed-variant": "#504840",
+          "on-tertiary-fixed-variant": "#6e3030",
+          "on-primary-fixed": "#401a08",
+          "on-secondary-container": "#605850",
+          "inverse-surface": "#3a302a",
+          "on-error": "#ffffff",
+          "secondary-fixed": "#eae2da",
+          "on-tertiary": "#ffffff"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "fontFamily": {
+          "headline": [
+            "EB Garamond"
+          ],
+          "display": [
+            "EB Garamond"
+          ],
+          "body": [
+            "Manrope"
+          ],
+          "label": [
+            "Manrope"
+          ]
+        }
+      },
+    },
+  }
+</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-background font-body text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-surface/80 backdrop-blur-2xl pt-safe border-b border-outline-variant/20 transition-all duration-300 shadow-[0_1px_12px_rgba(58,48,42,0.03)]"><div class="h-16 px-6 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full overflow-hidden border border-primary/30 flex items-center justify-center bg-surface-container"><img alt="Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKbd-V-X7s8STt66qDeGOGXTHLaolgHf09a0aDynb5vH0I5mqFR4spCm0F1Q80p2qM-oCYYUVGUhScXOkwE2N3O8ceRlMj5JHFw_dpBrVBMDkK0ObkwgaGQ3idlG3GkJOQTtsP0sMQCt5tgzHBL8YAbWVOcGZztbzCKA21PhcEkaoie0vA4ILudk1JFxb7Vx1SqCLyPXTsAQU7p_vL20JUcVbkNp-NLv-Y38Cj66uoZCSVa2Z6sOZwqDXrqCsrw_9qE0s"></div><span class="font-headline font-semibold text-lg tracking-wide text-on-surface">PHANTOM<span class="text-primary font-normal">GUARD</span></span></div><div class="flex items-center gap-2"><button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-full hover:bg-surface-container ios-press active:scale-[0.94] cursor-pointer"><span class="material-symbols-outlined text-[20px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center border border-primary/20 text-primary ios-press cursor-pointer active:scale-[0.94]"><span class="material-symbols-outlined text-[16px]">person</span></div></div></div></header><main class="flex flex-col relative w-full px-6 pt-20 pb-28 bg-background flex-grow"><div class="flex flex-col w-full pb-8">
+<!-- Module Header -->
+<div class="flex flex-col gap-1 mb-6">
+<div class="flex items-center justify-between">
+<span class="text-xs text-primary uppercase font-mono tracking-widest font-semibold">QUICK CHECK // SCANNER</span>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-xs text-on-surface-variant font-mono tracking-wider">PRIVATE &amp; SAFE</span>
+</div>
+<h1 class="text-3xl text-on-surface font-headline font-normal tracking-tight mt-1">Safety Scanner</h1>
+<p class="text-sm text-on-surface-variant font-body">Scan suspicious messages, phone call recordings, or videos to see if they are real or AI-generated scams.</p>
+</div>
+<!-- Analysis Mode Tabs -->
+<div class="grid grid-cols-3 gap-1.5 p-1.5 rounded-xl bg-surface-container-low mb-6 border border-outline-variant/20 ios-fade-up shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]">
+<button class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg bg-surface text-on-surface text-sm font-medium transition-all shadow-sm border border-outline-variant/30 ios-press active:scale-[0.96] cursor-pointer" id="tab-text" onclick="switchTab('text')">
+<span class="material-symbols-outlined text-[18px] text-primary">description</span>
+<span class="">Text</span>
+</button>
+<button class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-on-surface-variant text-sm font-medium transition-all hover:text-on-surface ios-press active:scale-[0.96] cursor-pointer" id="tab-voice" onclick="switchTab('voice')">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+<span class="">Voice</span>
+</button>
+<button class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-on-surface-variant text-sm font-medium transition-all hover:text-on-surface ios-press active:scale-[0.96] cursor-pointer" id="tab-video" onclick="switchTab('video')">
+<span class="material-symbols-outlined text-[18px]">videocam</span>
+<span class="">Video</span>
+</button>
+</div>
+<!-- Tab Content: Text Analysis -->
+<div class="flex flex-col gap-5" id="content-text">
+<!-- Input Card -->
+<div class="flex flex-col gap-4 p-5 rounded-2xl bg-surface-container-low border border-outline-variant/30 relative overflow-hidden shadow-sm ios-fade-up transition-shadow duration-300 hover:shadow-md">
+<div class="absolute -right-12 -top-12 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<label class="text-xs text-on-surface uppercase font-mono tracking-wider font-semibold">Payload Input</label>
+<span class="text-xs text-on-surface-variant">Paste raw logs, email, or URL</span>
+</div>
+<div class="relative">
+<textarea class="w-full bg-surface text-on-surface p-4 rounded-xl text-sm font-mono resize-none focus:outline-none focus:ring-1 focus:ring-primary/50 border border-outline-variant/40 shadow-inner" id="threat-input" placeholder="Paste suspicious message or payload here..." rows="4">URGENT: Your executive cloud access requires immediate re-verification due to anomalous regional login. Click here to secure your credentials instantly: https://secure-auth-phantom-guard.net/verify</textarea>
+</div>
+<div class="flex items-center justify-between pt-1"><label class="flex items-center gap-2 cursor-pointer ios-press active:scale-[0.96]"><input class="hidden" onchange="handleFileUpload(event)" type="file"><div class="flex items-center gap-2 py-2 px-3.5 rounded-lg bg-surface text-on-surface text-xs font-medium hover:bg-surface-bright transition-colors border border-outline-variant/40 shadow-sm"><span class="material-symbols-outlined text-[16px] text-primary">upload_file</span><span class="">Upload EML/Log</span></div></label><button class="flex items-center gap-2 py-2.5 px-5 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:brightness-105 transition-all shadow-md shadow-primary/10 tracking-wide uppercase font-mono ios-press active:scale-[0.96] cursor-pointer" onclick="runAnalysis()"><span class="material-symbols-outlined text-[16px]">bolt</span><span class="">Execute Scan</span></button></div>
+</div>
+<!-- Scanning State (Hidden by default, toggled via JS) -->
+<div class="hidden flex-col items-center justify-center p-8 gap-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 text-center relative overflow-hidden shadow-sm" id="scanning-state">
+<div class="absolute inset-0 bg-primary/5 animate-pulse pointer-events-none"></div>
+<div class="relative w-20 h-20 flex items-center justify-center">
+<!-- Animated Concentric Rings -->
+<div class="absolute inset-0 rounded-full border border-primary/20 animate-ping"></div>
+<div class="absolute inset-2 rounded-full border-2 border-dashed border-primary animate-spin" style="animation-duration: 6s;"></div>
+<span class="material-symbols-outlined text-primary text-[28px] animate-pulse">radar</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xl text-on-surface font-headline font-normal">Running Deep Heuristics</span>
+<span class="text-xs text-on-surface-variant font-mono" id="scan-status-text">Analyzing linguistic vectors &amp; domain reputation...</span>
+</div>
+<div class="w-full max-w-xs h-1.5 bg-surface-dim rounded-full overflow-hidden">
+<div class="h-full bg-primary transition-all duration-300 w-1/4" id="scan-progress"></div>
+</div>
+</div>
+<!-- Results Breakdown (Shown after scan) -->
+<div class="flex flex-col gap-4 ios-fade-up" id="result-breakdown">
+<!-- Risk Score Header Card -->
+<div class="flex items-center justify-between p-5 rounded-2xl bg-error-container/15 border border-error/20 relative overflow-hidden shadow-sm"><div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-error/10 to-transparent pointer-events-none"></div><div class="flex items-center gap-4"><div class="w-16 h-16 rounded-xl bg-error/15 flex flex-col items-center justify-center text-error border border-error/30 shadow-inner ios-spring"><span class="text-2xl font-headline font-bold leading-none">91</span><span class="text-[10px] font-mono opacity-80 uppercase">/100</span></div><div class="flex flex-col"><div class="flex items-center gap-1.5"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-error"></span></span><span class="text-xs font-mono text-error uppercase tracking-wider font-semibold">Critical Risk Detected</span></div><h2 class="text-xl text-on-surface font-headline font-normal mt-0.5">High-Probability Phishing</h2></div></div><div class="flex items-center gap-2"><button class="w-9 h-9 rounded-lg bg-surface border border-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-surface-bright transition-all shadow-sm ios-press active:scale-[0.92] cursor-pointer" title="Share Report"><span class="material-symbols-outlined text-[18px]">share</span></button></div></div>
+<!-- AI Threat Explanation -->
+<div class="flex flex-col gap-2 p-5 rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[18px]">psychology</span>
+<span class="text-xs uppercase font-mono tracking-wider font-semibold">AI Intelligence Summary</span>
+</div>
+<p class="text-sm text-on-surface leading-relaxed font-body">
+          Potential phishing and social engineering attack. The payload leverages artificial urgency ("immediate re-verification") combined with domain spoofing (<span class="font-mono text-error">secure-auth-phantom-guard.net</span>) to hijack executive credentials.
+        </p>
+</div>
+<!-- Highlighted Suspicious Segments -->
+<div class="flex flex-col gap-2.5 p-5 rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">highlight</span>
+<span class="text-xs uppercase font-mono tracking-wider font-semibold">Highlighted Anomalies</span>
+</div>
+<div class="p-4 rounded-xl bg-surface font-mono text-xs leading-relaxed text-on-surface-variant border border-outline-variant/40 shadow-inner">
+<span class="bg-error/20 text-error px-1.5 py-0.5 rounded font-medium">URGENT: Your executive cloud access requires immediate re-verification</span> due to anomalous regional login. Click here to secure your credentials instantly: <span class="bg-error/20 text-error px-1.5 py-0.5 rounded underline font-medium">https://secure-auth-phantom-guard.net/verify</span>
+</div>
+</div>
+<!-- Psychological Manipulation Breakdown -->
+<div class="flex flex-col gap-3 p-5 rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-[18px]">radar</span>
+<span class="text-xs uppercase font-mono tracking-wider font-semibold">Psychological Vectors</span>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex flex-col p-3.5 rounded-xl bg-surface border border-outline-variant/40 gap-1 shadow-sm">
+<span class="text-xs text-error font-mono font-semibold tracking-wider">HIGH URGENCY</span>
+<span class="text-xs text-on-surface-variant">Forces rapid compliance without scrutiny</span>
+</div>
+<div class="flex flex-col p-3.5 rounded-xl bg-surface border border-outline-variant/40 gap-1 shadow-sm">
+<span class="text-xs text-error font-mono font-semibold tracking-wider">AUTHORITY BIAS</span>
+<span class="text-xs text-on-surface-variant">Impersonates internal cloud security</span>
+</div>
+</div>
+</div>
+<!-- Recommended Actions -->
+<div class="flex flex-col gap-3 p-5 rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[18px]">shield_lock</span>
+<span class="text-xs uppercase font-mono tracking-wider font-semibold">Recommended Remediation</span>
+</div>
+<div class="grid grid-cols-2 gap-3 pt-1"><button class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-error text-on-error text-xs font-bold hover:brightness-110 transition-all shadow-md shadow-error/10 uppercase tracking-wider font-mono ios-press active:scale-[0.96] cursor-pointer"><span class="material-symbols-outlined text-[16px]">block</span><span class="">Block Sender</span></button><button class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-surface text-on-surface text-xs font-semibold hover:bg-surface-bright transition-all border border-outline-variant/40 shadow-sm ios-press active:scale-[0.96] cursor-pointer"><span class="material-symbols-outlined text-[16px]">content_copy</span><span class="">Quarantine IOC</span></button></div>
+</div>
+</div>
+</div>
+<!-- Tab Content: Voice Analysis (Placeholder State) -->
+<div class="hidden flex-col gap-4" id="content-voice">
+<div class="flex flex-col items-center justify-center p-8 gap-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 text-center shadow-sm">
+<div class="w-16 h-16 rounded-full bg-surface border border-primary/20 flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[28px]">mic</span>
+</div>
+<div class="flex flex-col gap-1 max-w-xs">
+<span class="text-xl text-on-surface font-headline font-normal">Voice Biometric Inspection</span>
+<span class="text-xs text-on-surface-variant">Upload audio recording or VoIP stream for deepfake &amp; synthetic voice detection.</span>
+</div>
+<label class="flex items-center gap-2 py-3 px-6 rounded-xl bg-primary text-on-primary text-xs font-bold cursor-pointer hover:brightness-105 transition-all shadow-md uppercase font-mono tracking-wider mt-2">
+<input accept="audio/*" class="hidden" type="file">
+<span class="material-symbols-outlined text-[16px]">audio_file</span>
+<span class="">Select Audio File</span>
+</label>
+</div>
+</div>
+<!-- Tab Content: Video Analysis (Placeholder State) -->
+<div class="hidden flex-col gap-4" id="content-video">
+<div class="flex flex-col items-center justify-center p-8 gap-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 text-center shadow-sm">
+<div class="w-16 h-16 rounded-full bg-surface border border-primary/20 flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[28px]">videocam</span>
+</div>
+<div class="flex flex-col gap-1 max-w-xs">
+<span class="text-xl text-on-surface font-headline font-normal">Visual Deepfake Scanner</span>
+<span class="text-xs text-on-surface-variant">Upload video stream to analyze facial landmark manipulation and optical discrepancies.</span>
+</div>
+<label class="flex items-center gap-2 py-3 px-6 rounded-xl bg-primary text-on-primary text-xs font-bold cursor-pointer hover:brightness-105 transition-all shadow-md uppercase font-mono tracking-wider mt-2">
+<input accept="video/*" class="hidden" type="file">
+<span class="material-symbols-outlined text-[16px]">movie</span>
+<span class="">Select Video File</span>
+</label>
+</div>
+</div>
+<script>
+    function switchTab(tab) {
+      ['text', 'voice', 'video'].forEach(t => {
+        const btn = document.getElementById('tab-' + t);
+        const content = document.getElementById('content-' + t);
+        if (t === tab) {
+          btn.className = "flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg bg-surface text-on-surface text-sm font-medium transition-all shadow-sm border border-outline-variant/30";
+          // Add primary icon color highlight dynamically if needed, or keep standard
+          content.classList.remove('hidden');
+          content.classList.add('flex');
+        } else {
+          btn.className = "flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-on-surface-variant text-sm font-medium transition-all hover:text-on-surface";
+          content.classList.remove('flex');
+          content.classList.add('hidden');
+        }
+      });
+    }
+
+    function runAnalysis() {
+      const inputCard = document.getElementById('threat-input').closest('.flex.flex-col');
+      const scanningState = document.getElementById('scanning-state');
+      const resultBreakdown = document.getElementById('result-breakdown');
+      const progressBar = document.getElementById('scan-progress');
+      const statusText = document.getElementById('scan-status-text');
+
+      inputCard.classList.add('hidden');
+      resultBreakdown.classList.add('hidden');
+      scanningState.classList.remove('hidden');
+      scanningState.classList.add('flex');
+
+      let progress = 20;
+      const statuses = [
+        "Analyzing linguistic vectors & domain reputation...",
+        "Cross-referencing global threat intelligence feeds...",
+        "Executing neural intent classification...",
+        "Finalizing risk score & remediation matrix..."
+      ];
+      
+      let step = 0;
+      const interval = setInterval(() => {
+        progress += 25;
+        step++;
+        if (progressBar) progressBar.style.width = progress + '%';
+        if (statusText && statuses[step]) statusText.textContent = statuses[step];
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            scanningState.classList.remove('flex');
+            scanningState.classList.add('hidden');
+            resultBreakdown.classList.remove('hidden');
+            resultBreakdown.classList.add('flex');
+            inputCard.classList.remove('hidden');
+          }, 400);
+        }
+      }, 500);
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        document.getElementById('threat-input').value = "[Loaded File: " + file.name + "] \nURGENT: Verify identity immediately via external link to prevent suspension.";
+        runAnalysis();
+      }
+    }
+  </script>
+</div></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/80 backdrop-blur-2xl border-t border-outline-variant/20 shadow-[0_-1px_16px_rgba(58,48,42,0.04)]"><div class="flex justify-around items-center h-20 px-2"><a class="flex flex-col items-center justify-center gap-1 w-16 h-16 text-on-surface-variant hover:text-on-surface transition-all ios-press active:scale-[0.92]" data-path="home" href="#"><span class="material-symbols-outlined text-[22px]">shield</span><span class="text-[10px] font-mono uppercase tracking-wider">Home</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-1 w-16 h-16 transition-all text-primary font-semibold ios-press active:scale-[0.92]" data-path="analyze" href="#"><span class="material-symbols-outlined text-[22px]">analytics</span><span class="text-[10px] font-mono uppercase tracking-wider">Analyze</span></a><a class="flex flex-col items-center justify-center gap-1 w-16 h-16 text-on-surface-variant hover:text-on-surface transition-all ios-press active:scale-[0.92]" data-path="alerts" href="#"><span class="material-symbols-outlined text-[22px]">crisis_alert</span><span class="text-[10px] font-mono uppercase tracking-wider">Alerts</span></a><a class="flex flex-col items-center justify-center gap-1 w-16 h-16 text-on-surface-variant hover:text-on-surface transition-all ios-press active:scale-[0.92]" data-path="activity" href="#"><span class="material-symbols-outlined text-[22px]">terminal</span><span class="text-[10px] font-mono uppercase tracking-wider">Activity</span></a><a class="flex flex-col items-center justify-center gap-1 w-16 h-16 text-on-surface-variant hover:text-on-surface transition-all ios-press active:scale-[0.92]" data-path="profile" href="#"><span class="material-symbols-outlined text-[22px]">settings_account_box</span><span class="text-[10px] font-mono uppercase tracking-wider">Profile</span></a></div></nav>
+
+
+
+</body></html>
