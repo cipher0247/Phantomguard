@@ -1,0 +1,28 @@
+{
+  "model": "pg-text-tfidf-logreg",
+  "version": "1.0.0",
+  "trained_at": "2026-10-14T17:26:42Z",
+  "seed": 20260101,
+  "threshold": 0.35999999999999993,
+  "label_mapping": {
+    "0": "safe",
+    "1": "suspicious"
+  },
+  "score_meaning": "calibrated probability (sigmoid, fit on validation split) that the text is suspicious (spam/phishing-like) per the training data",
+  "normalizer_version": "2",
+  "max_chars": 5000,
+  "model_sha256": "dae32db58d42b90c232faeb0559cba0750f98a1e8ad04796c51cca3a65a385c2",
+  "dataset": {
+    "name": "ealvaradob/phishing-dataset (texts.json)",
+    "revision": "55caf9af01ae498d68ff44886ff69a4b165eb54b",
+    "declared_license": "apache-2.0",
+    "file_sha256": "2479fdb94abb59332cc747f7b823a1651921b9828240c5dad0ffdba66ab02581"
+  },
+  "dependencies": {
+    "python": "3.14.5",
+    "scikit_learn": "1.9.1",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0"
+  }
+}

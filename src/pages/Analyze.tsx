@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { api, bandLabel, pct, type Kind, type Scan } from '../api';
+import { api, riskLabel, pct, type Kind, type Scan } from '../api';
 import { Card, ErrorNote, Icon, kindIcon, RiskBadge, useAsync } from '../ui';
 import { MockBadge, MockNotice, ReportButton } from '../components';
 
@@ -11,7 +11,8 @@ const GUIDANCE = ['Do not click links or open attachments in the message.', 'Con
 
 function Result({ scan }: { scan: Scan }) {
   const tone = scan.mock ? 'bg-surface-container-low' : scan.risk === 'high' ? 'bg-error-container/50' : scan.risk === 'warning' ? 'bg-primary-fixed/50' : 'bg-surface-container-low';
-  const details = Object.entries(scan.details ?? {}).filter(([, v]) => ['string', 'number', 'boolean'].includes(typeof v));
+  const details = Object.entries(scan.details ?? {}).filter(([k, v]) => k !== 'limitations' && ['string', 'number', 'boolean'].includes(typeof v));
+  const limitations = typeof scan.details?.limitations === 'string' ? scan.details.limitations : null;
   return (<>
     {scan.mock && <MockNotice />}
     <Card className={`${tone} flex items-center gap-4`} >
@@ -19,8 +20,8 @@ function Result({ scan }: { scan: Scan }) {
         <span className="font-headline text-3xl font-semibold text-primary">{pct(scan.score)}</span><span className="text-xs text-on-surface-variant">/100</span>
       </div>
       <div className="min-w-0 flex-1">
-        <div className="flex gap-2 items-center flex-wrap">{scan.mock ? <MockBadge /> : <RiskBadge risk={scan.risk}>{bandLabel(scan.score)}</RiskBadge>}</div>
-        <h3 className="font-headline text-xl mt-1 break-words">{scan.label}</h3>
+        <div className="flex gap-2 items-center flex-wrap">{scan.mock ? <MockBadge /> : <><span className="text-xs px-2 py-0.5 rounded font-label font-bold bg-primary text-on-primary tracking-wider">TRAINED MODEL</span><RiskBadge risk={scan.risk}>{riskLabel(scan)}</RiskBadge></>}</div>
+        <h3 className="font-headline text-xl mt-1 break-words capitalize">{scan.label}</h3>
         <p className="text-xs text-on-surface-variant mt-1">Model: {scan.model} (v{scan.version})</p>
       </div>
       <ReportButton id={scan.id} className="shrink-0" />
@@ -29,8 +30,9 @@ function Result({ scan }: { scan: Scan }) {
       <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">How to read this</h4>
       {scan.mock
         ? <p className="text-sm text-on-surface-variant">This score is a deterministic placeholder from a test stub (it only reflects message length). It carries no information about whether the message is a scam.</p>
-        : <p className="text-sm text-on-surface-variant">{scan.limitation ?? 'The score is a probability estimate from a trained model, not proof.'} Higher means the model considers the input more likely to be malicious or synthetic.</p>}
-      {details.length > 0 && <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">{details.map(([k, v]) => <div key={k} className="rounded-lg bg-surface-container-lowest p-3"><dt className="text-on-surface-variant uppercase tracking-wider">{k}</dt><dd className="font-semibold mt-0.5 break-words">{String(v)}</dd></div>)}</dl>}
+        : <><p className="text-sm text-on-surface-variant">{scan.limitation ?? 'The score is a probability estimate from a trained model, not proof.'} Higher means the model considers the input more likely to be malicious or synthetic.</p>
+          {limitations && <p className="text-sm text-on-surface-variant mt-2"><span className="font-semibold">Known limits: </span>{limitations}</p>}</>}
+      {details.length > 0 && <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">{details.map(([k, v]) => <div key={k} className="rounded-lg bg-surface-container-lowest p-3"><dt className="text-on-surface-variant uppercase tracking-wider">{k.replace(/_/g, ' ')}</dt><dd className="font-semibold mt-0.5 break-words">{String(v)}</dd></div>)}</dl>}
     </Card>
     {scan.risk !== 'low' && !scan.mock && <Card>
       <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">General guidance (not model output)</h4>
@@ -86,6 +88,7 @@ export function Analyze() {
     </div>
 
     <Card>
+      {status.error && !status.data && <div className="mb-4"><ErrorNote message={status.error} onRetry={status.reload} /></div>}
       {status.data && !available && <div className="mb-4"><ErrorNote message={`The ${tab} model is not configured on this server, so scans cannot run. See README for setup.`} /></div>}
       {tab === 'text' ? (<>
         <label htmlFor="payload" className="text-xs uppercase tracking-widest font-semibold">Payload input</label>

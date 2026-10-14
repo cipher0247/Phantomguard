@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Db } from './db.js';
 import { COOKIE, bearer, createSession, verifyDummy, destroySession, rateLimit, requireAuth, verifyPassword, type AuthedRequest } from './auth.js';
-import { availability, ModelBadResponse, ModelTimeout, ModelUnavailable, runModel, type Kind } from './models.js';
+import { availability, ModelBadResponse, ModelRejectedInput, ModelTimeout, ModelUnavailable, runModel, type Kind } from './models.js';
 import { askAdvisor } from './advisor.js';
 
 const LIMITS = {
@@ -18,7 +18,14 @@ const LIMITS = {
 export const RISK = { high: 0.7, warn: 0.4 };
 // Results from the bundled mock service are flagged so the UI can never present them as real predictions.
 const isMock = (model: string) => /^MOCK/i.test(model);
-const riskBand = (s: number) => (s >= RISK.high ? 'high' : s >= RISK.warn ? 'warning' : 'low');
+// A model that reports its own calibrated decision threshold (details.threshold) decides safe vs. suspicious: below it is 'low',
+// from it up 'warning', and >= 0.85 'high'. Models without a threshold fall back to the fixed 0.4 / 0.7 bands.
+const HIGH_WITH_THRESHOLD = 0.85;
+const riskBand = (s: number, details?: Record<string, unknown>) => {
+  const t = details?.threshold;
+  if (typeof t === 'number' && t > 0 && t < 1) return s < t ? 'low' : s >= HIGH_WITH_THRESHOLD ? 'high' : 'warning';
+  return s >= RISK.high ? 'high' : s >= RISK.warn ? 'warning' : 'low';
+};
 
 const MAGIC: Record<string, (b: Buffer) => boolean> = {
   wav: (b) => b.toString('ascii', 0, 4) === 'RIFF' && b.toString('ascii', 8, 12) === 'WAVE',
@@ -89,9 +96,10 @@ export function createApp(db: Db) {
     const created = new Date().toISOString();
     const info = db.prepare('INSERT INTO scans (user_id,kind,label,score,model,model_version,details,input_meta,created_at) VALUES (?,?,?,?,?,?,?,?,?)')
       .run(userId, kind, r.label, r.score, r.model, r.version, JSON.stringify(r.details ?? {}), JSON.stringify(meta), created);
-    return { id: Number(info.lastInsertRowid), kind, ...r, mock: isMock(r.model), risk: riskBand(r.score), createdAt: created };
+    return { id: Number(info.lastInsertRowid), kind, ...r, mock: isMock(r.model), risk: riskBand(r.score, r.details as Record<string, unknown>), createdAt: created };
   };
   const fail = (res: express.Response, e: unknown) => {
+    if (e instanceof ModelRejectedInput) return void res.status(422).json({ error: 'input_rejected', message: e.message });
     if (e instanceof ModelTimeout) return void res.status(504).json({ error: 'model_timeout', message: e.message });
     if (e instanceof ModelBadResponse) return void res.status(502).json({ error: 'model_bad_response', message: e.message });
     if (e instanceof ModelUnavailable) return void res.status(503).json({ error: 'model_unavailable', message: e.message });
@@ -137,7 +145,7 @@ export function createApp(db: Db) {
   app.post('/api/scan/audio', auth, uploadOne('audio'), fileScan('audio'));
   app.post('/api/scan/video', auth, uploadOne('video'), fileScan('video'));
 
-  const row = (r: any) => ({ mock: isMock(r.model), id: r.id, kind: r.kind, label: r.label, score: r.score, risk: riskBand(r.score), model: r.model, version: r.model_version,
+  const row = (r: any) => ({ mock: isMock(r.model), id: r.id, kind: r.kind, label: r.label, score: r.score, risk: riskBand(r.score, JSON.parse(r.details)), model: r.model, version: r.model_version,
     details: JSON.parse(r.details), input: JSON.parse(r.input_meta), createdAt: r.created_at });
   app.get('/api/scans', auth, (req: AuthedRequest, res) => {
     const kind = z.enum(['text', 'audio', 'video']).optional().safeParse(req.query.kind);
@@ -145,6 +153,11 @@ export function createApp(db: Db) {
     const rows = db.prepare(`SELECT * FROM scans WHERE user_id=? AND id<? ${kind.data ? 'AND kind=?' : ''} ORDER BY id DESC LIMIT ?`)
       .all(...[req.user!.id, before, ...(kind.data ? [kind.data] : []), limit]) as any[];
     res.json({ scans: rows.map(row) });
+  });
+  app.get('/api/scans/:id', auth, (req: AuthedRequest, res) => {
+    const r = db.prepare('SELECT * FROM scans WHERE id=? AND user_id=?').get(Number(req.params.id), req.user!.id);
+    if (!r) return void res.status(404).json({ error: 'not_found', message: 'Scan not found.' });
+    res.json({ ...row(r), limitation: LIMITATION });
   });
   app.get('/api/scans/:id/report', auth, (req: AuthedRequest, res) => {
     const r = db.prepare('SELECT * FROM scans WHERE id=? AND user_id=?').get(Number(req.params.id), req.user!.id);
@@ -155,9 +168,19 @@ export function createApp(db: Db) {
   app.get('/api/summary', auth, (req: AuthedRequest, res) => {
     const u = req.user!.id;
     // Scans from the MOCK service are counted separately and never feed risk figures.
-    const t = db.prepare("SELECT COUNT(*) total, COALESCE(SUM(score>=? AND model NOT LIKE 'MOCK%'),0) high, COALESCE(SUM(model LIKE 'MOCK%'),0) mock, MAX(created_at) last FROM scans WHERE user_id=?").get(RISK.high, u) as any;
-    const d = db.prepare("SELECT COUNT(*) n, MAX(score) maxScore FROM scans WHERE user_id=? AND model NOT LIKE 'MOCK%' AND created_at>?").get(u, new Date(Date.now() - 86_400_000).toISOString()) as any;
-    res.json({ totalScans: t.total, mockScans: t.mock, highRisk: t.high, lastScanAt: t.last, last24h: { scans: d.n, maxScore: d.maxScore } });
+    // Computed in JS so each model's own threshold (see riskBand) is respected; history per user is small.
+    const all = db.prepare('SELECT score, model, details, created_at FROM scans WHERE user_id=?').all(u) as any[];
+    const real = all.filter((r) => !isMock(r.model));
+    const since = new Date(Date.now() - 86_400_000).toISOString();
+    const recent = real.filter((r) => r.created_at > since);
+    res.json({
+      totalScans: all.length, mockScans: all.length - real.length,
+      highRisk: real.filter((r) => riskBand(r.score, JSON.parse(r.details)) === 'high').length,
+      flagged: real.filter((r) => riskBand(r.score, JSON.parse(r.details)) !== 'low').length, // suspicious: warning or high
+      lastScanAt: all.reduce<string | null>((m, r) => (!m || r.created_at > m ? r.created_at : m), null),
+      last24h: { scans: recent.length, maxScore: recent.length ? Math.max(...recent.map((r) => r.score)) : null,
+        flagged: recent.filter((r) => riskBand(r.score, JSON.parse(r.details)) !== 'low').length },
+    });
   });
 
   app.post('/api/advisor', auth, rateLimit(20, 60_000), async (req, res) => {

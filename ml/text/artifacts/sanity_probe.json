@@ -1,0 +1,47 @@
+{
+  "note": "Anecdotal examples, NOT evaluation metrics. They are outside the training distribution and show failure modes.",
+  "results": [
+    {
+      "case": "modern phishing SMS",
+      "expected": "suspicious",
+      "score": 0.9976,
+      "predicted": "suspicious"
+    },
+    {
+      "case": "delivery scam SMS",
+      "expected": "suspicious",
+      "score": 0.6248,
+      "predicted": "suspicious"
+    },
+    {
+      "case": "credential-reset email",
+      "expected": "suspicious",
+      "score": 0.9697,
+      "predicted": "suspicious"
+    },
+    {
+      "case": "classic spam",
+      "expected": "suspicious",
+      "score": 0.9998,
+      "predicted": "suspicious"
+    },
+    {
+      "case": "benign lunch",
+      "expected": "safe",
+      "score": 0.0,
+      "predicted": "safe"
+    },
+    {
+      "case": "benign work email",
+      "expected": "safe",
+      "score": 0.0008,
+      "predicted": "safe"
+    },
+    {
+      "case": "benign real notification",
+      "expected": "safe",
+      "score": 0.9779,
+      "predicted": "suspicious"
+    }
+  ]
+}

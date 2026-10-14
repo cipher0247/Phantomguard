@@ -7,6 +7,8 @@ export interface ModelResult { score: number; label: string; model: string; vers
 export class ModelUnavailable extends Error {}
 /** Service did not answer within PG_MODEL_TIMEOUT_MS -> 504. */
 export class ModelTimeout extends Error {}
+/** The model service refused this particular input (its 4xx) -> 422 with its short reason. */
+export class ModelRejectedInput extends Error {}
 /** Service answered with something that violates the contract -> 502. */
 export class ModelBadResponse extends Error {}
 
@@ -34,7 +36,7 @@ export function parseModelResponse(j: any): ModelResult {
   const details: ModelResult['details'] = {};
   if (j.details && typeof j.details === 'object' && !Array.isArray(j.details))
     for (const [k, v] of Object.entries(j.details).slice(0, 10))
-      if (k.length <= 40 && (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && v.length <= 200))) details[k] = v as never;
+      if (k.length <= 40 && (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && v.length <= (k === 'limitations' ? 500 : 200)))) details[k] = v as never;
   return { score: j.score, label: j.label, model: j.model, version: j.version, details };
 }
 
@@ -53,6 +55,11 @@ export async function runModel(kind: Kind, body: { text: string } | { file: Buff
   catch (e) {
     if ((e as Error).name === 'TimeoutError') throw new ModelTimeout(`The ${kind} model took too long to respond.`);
     throw new ModelUnavailable(`The ${kind} model service is unreachable.`);
+  }
+  if ([400, 413, 415, 422].includes(res.status)) {
+    // The service judged this input unusable; relay its short, service-authored reason (bounded) rather than calling it an outage.
+    const reason = await res.json().then((j: any) => (typeof j?.message === 'string' ? j.message.slice(0, 200) : ''), () => '');
+    throw new ModelRejectedInput(reason || `The ${kind} model could not analyse this input.`);
   }
   if (!res.ok) throw new ModelUnavailable(`The ${kind} model service failed (${res.status}).`);
   let j: unknown;

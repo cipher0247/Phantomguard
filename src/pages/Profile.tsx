@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getPrefs, setPref } from '../prefs';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { Card, Icon, useAsync } from '../ui';
@@ -11,6 +13,8 @@ export function Profile() {
   const nav = useNavigate();
   const status = useAsync(api.status);
   const m = status.data?.models;
+  const [playIntro, setPlayIntro] = useState(getPrefs().playIntro);
+  const toggleIntro = () => { setPref('playIntro', !playIntro); setPlayIntro(!playIntro); };
   const out = async () => { await signOut(); nav('/signin', { replace: true }); };
   const row = 'flex items-center gap-4 p-4';
   return (<>
@@ -24,6 +28,14 @@ export function Profile() {
       {([['text', 'Text phishing model'], ['audio', 'Voice deepfake model'], ['video', 'Video deepfake model'], ['advisor', 'AI advisor (generative)']] as const).map(([k, n]) => (
         <div key={k} className={`${row} justify-between`}><span className="text-sm font-semibold">{n}</span>
           <span className={`text-xs font-semibold ${m?.[k] ? 'text-primary' : 'text-on-surface-variant'}`}>{m ? (m[k] ? 'Configured' : 'Not configured') : '…'}</span></div>))}
+    </Card>
+
+    <h2 className={label}>Preferences</h2>
+    <Card className="p-0">
+      <label className="flex items-center gap-4 p-4 cursor-pointer min-h-[56px]">
+        <span className="flex-1"><span className="block text-sm font-semibold">Play intro video on launch</span><span className="block text-xs text-on-surface-variant">Saved on this device. You can always tap Skip.</span></span>
+        <input type="checkbox" role="switch" checked={playIntro} onChange={toggleIntro} className="accent-primary w-6 h-6" aria-label="Play intro video on launch" />
+      </label>
     </Card>
 
     <h2 className={label}>Backend connection</h2>

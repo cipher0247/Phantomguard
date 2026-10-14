@@ -6,7 +6,7 @@ export interface Scan { mock: boolean; id: number; kind: Kind; label: string; sc
   input: Record<string, unknown>; createdAt: string; limitation?: string }
 export interface Status { models: Record<Kind | 'advisor', boolean>;
   demo: boolean; limits: { text: number; audio: { bytes: number; exts: string[]; maxSeconds: number }; video: { bytes: number; exts: string[] } } }
-export interface Summary { mockScans: number; totalScans: number; highRisk: number; lastScanAt: string | null; last24h: { scans: number; maxScore: number | null } }
+export interface Summary { mockScans: number; totalScans: number; highRisk: number; flagged: number; lastScanAt: string | null; last24h: { scans: number; maxScore: number | null; flagged: number } }
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
@@ -23,12 +23,21 @@ const endpoint = (path: string) => {
 };
 const ABSENT = 'Cannot reach the server. Check the address and that the phone and server are on the same network.';
 
-async function req<T>(path: string, init?: RequestInit): Promise<T> {
+/** Fired when the server rejects the session (expired, revoked, server restarted with a new database). The auth provider signs the user out. */
+export const SESSION_EXPIRED = 'pg:session-expired';
+
+async function req<T>(path: string, init?: RequestInit, timeoutMs = 30_000): Promise<T> {
   let r: Response;
-  try { r = await fetch(endpoint(path), { ...init, credentials: isNative() ? 'omit' : 'same-origin', headers: { ...authHeaders(), ...init?.headers } }); }
-  catch (e) { if (e instanceof ApiError) throw e; throw new ApiError(0, 'network', ABSENT); }
+  try {
+    r = await fetch(endpoint(path), { ...init, signal: AbortSignal.timeout(timeoutMs), credentials: isNative() ? 'omit' : 'same-origin', headers: { ...authHeaders(), ...init?.headers } });
+  } catch (e) {
+    if (e instanceof ApiError) throw e;
+    if ((e as Error).name === 'TimeoutError') throw new ApiError(0, 'timeout', 'The server took too long to respond. Try again.');
+    throw new ApiError(0, 'network', ABSENT);
+  }
+  if (r.status === 401 && path !== '/auth/login') { clearToken(); window.dispatchEvent(new Event(SESSION_EXPIRED)); }
   if (!r.ok) throw await toError(r);
-  return r.json();
+  try { return await r.json(); } catch { throw new ApiError(r.status, 'bad_response', 'The server sent an unreadable response.'); }
 }
 const json = (body: unknown): RequestInit => ({ method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
 
@@ -40,6 +49,7 @@ export const api = {
   health: async (baseUrl = apiBase(), timeoutMs = 5000) => {
     try { return (await fetch(`${baseUrl}/api/health`, { signal: AbortSignal.timeout(timeoutMs), credentials: 'omit' })).ok; } catch { return false; }
   },
+  scan: (id: number) => req<Scan>(`/scans/${id}`),
   report: (id: number) => req<Record<string, unknown>>(`/scans/${id}/report`),
   status: () => req<Status>('/status'),
   summary: () => req<Summary>('/summary'),
@@ -47,7 +57,7 @@ export const api = {
     const q = new URLSearchParams(Object.entries(opts).filter(([, v]) => v != null).map(([k, v]) => [k, String(v)]));
     return req<{ scans: Scan[] }>(`/scans?${q}`).then((r) => r.scans);
   },
-  scanText: (text: string) => req<Scan>('/scan/text', json({ text })),
+  scanText: (text: string) => req<Scan>('/scan/text', json({ text }), 60_000),
   advisor: (messages: { role: 'user' | 'assistant'; content: string }[]) => req<{ reply: string }>('/advisor', json({ messages })).then((r) => r.reply),
   // XHR rather than fetch: fetch cannot report upload progress.
   scanFile: (kind: 'audio' | 'video', file: File, onProgress: (pct: number) => void) => new Promise<Scan>((resolve, reject) => {
@@ -68,4 +78,4 @@ export const api = {
 };
 
 export const pct = (s: number) => Math.round(s * 100);
-export const bandLabel = (s: number) => (s >= 0.9 ? 'Critical' : s >= 0.7 ? 'High risk' : s >= 0.4 ? 'Warning' : 'Low risk');
+export const riskLabel = (s: Pick<Scan, 'risk' | 'score'>) => (s.risk === 'high' ? (s.score >= 0.95 ? 'Critical' : 'High risk') : s.risk === 'warning' ? 'Warning' : 'Low risk');

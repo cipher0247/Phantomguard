@@ -5,7 +5,7 @@ import { Icon, ErrorNote } from '../ui';
 import { ServerStatus } from '../components';
 
 export function SignIn() {
-  const { user, ready, signIn } = useAuth();
+  const { user, ready, expired, signIn } = useAuth();
   const nav = useNavigate();
   const from = (useLocation().state as { from?: string } | null)?.from ?? '/';
   const [email, setEmail] = useState('');
@@ -64,6 +64,7 @@ export function SignIn() {
             <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="accent-primary w-4 h-4" />
             Remember this device for 30 days
           </label>
+          {expired && !error && <p role="status" className="text-sm rounded-xl bg-primary-fixed/60 px-4 py-3">Your session ended. Please sign in again.</p>}
           {error && <ErrorNote message={error} />}
           <button type="submit" disabled={busy}
             className="w-full h-12 rounded-xl bg-primary text-on-primary text-sm font-semibold shadow-[0_4px_20px_rgba(194,101,42,0.25)] flex items-center justify-center gap-2 hover:bg-primary-container disabled:opacity-60 active:scale-[0.98] transition">

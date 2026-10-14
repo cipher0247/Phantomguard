@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { getPrefs } from './prefs';
 
 // Module-level: survives React StrictMode double-mounts and route changes; resets only on a new app launch (page load).
 let introFinished = false;
 export const resetIntroForTests = () => { introFinished = false; };
-export const shouldShowIntro = () => !introFinished;
+export const shouldShowIntro = () => !introFinished && getPrefs().playIntro;
 
 const SRC = '/intro/phantomguard_intro.mp4';
 const START_TIMEOUT_MS = 4000; // if playback has not begun, treat as failure and continue

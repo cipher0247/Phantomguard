@@ -1,7 +1,7 @@
 import { NavLink, Link, Outlet } from 'react-router-dom';
 import { useEffect, useState, type ReactNode } from 'react';
 import { api, type Risk } from './api';
-import { useKeyboardOpen } from './components';
+import { ConnectionBanner, useKeyboardOpen } from './components';
 
 export const Icon = ({ name, fill, className = '' }: { name: string; fill?: boolean; className?: string }) =>
   <span aria-hidden="true" className={`material-symbols-outlined ${fill ? 'icon-fill' : ''} ${className}`}>{name}</span>;
@@ -31,6 +31,7 @@ export function Shell() {
           <div role="note" data-testid="demo-banner" className="rounded-xl bg-inverse-surface text-on-primary text-xs text-center font-semibold py-2 px-4">
             DEMO MODE: any scan results come from a MOCK test service, not an AI model.
           </div>)}
+        <ConnectionBanner />
         <Outlet />
       </main>
       <nav aria-label="Primary" hidden={kb} className="fixed bottom-0 inset-x-0 z-40 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/40 pb-safe">
@@ -57,8 +58,13 @@ export const Card = ({ children, className = '' }: { children: ReactNode; classN
 export const Spinner = ({ label = 'Loading' }: { label?: string }) =>
   <div role="status" className="flex items-center gap-2 text-sm text-on-surface-variant py-6 justify-center"><Icon name="progress_activity" className="animate-spin" />{label}…</div>;
 
-export const ErrorNote = ({ message }: { message: string }) =>
-  <p role="alert" className="text-sm text-error bg-error-container rounded-xl px-4 py-3 flex gap-2"><Icon name="error" className="text-[20px]" />{message}</p>;
+export const ErrorNote = ({ message, onRetry }: { message: string; onRetry?: () => void }) => (
+  <div role="alert" className="text-sm text-error bg-error-container rounded-xl px-4 py-3 flex gap-2 items-start">
+    <Icon name="error" className="text-[20px] shrink-0" />
+    <span className="flex-1 min-w-0 break-words">{message}</span>
+    {onRetry && <button type="button" onClick={onRetry} className="shrink-0 min-h-[44px] -my-2 px-3 font-semibold underline underline-offset-4">Retry</button>}
+  </div>
+);
 
 export const kindIcon = { text: 'description', audio: 'mic', video: 'videocam' } as const;
 export const kindName = { text: 'Text message', audio: 'Voice recording', video: 'Video' } as const;
@@ -69,12 +75,22 @@ export const timeAgo = (iso: string) => {
 
 export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []) {
   const [s, set] = useState<{ data?: T; error?: string; loading: boolean }>({ loading: true });
+  const [n, setN] = useState(0);
+  const reload = () => setN((x) => x + 1);
   useEffect(() => {
     let live = true;
-    set({ loading: true });
+    set((p) => ({ data: p.data, loading: true })); // keep showing old data while refreshing
     fn().then((data) => live && set({ data, loading: false }), (e) => live && set({ error: e.message, loading: false }));
     return () => { live = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-  return s;
+  }, [...deps, n]);
+  // Refresh when the app returns to the foreground or the network comes back, so screens never stay stale or stuck on an error.
+  useEffect(() => {
+    const again = () => setN((x) => x + 1);
+    window.addEventListener(APP_RESUME, again);
+    return () => window.removeEventListener(APP_RESUME, again);
+  }, []);
+  return { ...s, reload };
 }
+
+export const APP_RESUME = 'pg:resume';

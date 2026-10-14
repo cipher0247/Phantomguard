@@ -19,3 +19,7 @@ datasets/
 predictions/
 *.pem
 *.key
+ml/.venv/
+ml/text/data/
+__pycache__/
+*.pyc

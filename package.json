@@ -15,7 +15,10 @@
     "demo:setup": "tsx server/demo-setup.ts",
     "android:sync": "npm run build && node scripts/android-network.mjs && cap sync android",
     "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug",
-    "android:open": "cap open android"
+    "android:open": "cap open android",
+    "ml:text:train": "ml/.venv/Scripts/python.exe ml/text/train.py",
+    "ml:text:serve": "ml/.venv/Scripts/python.exe ml/text/serve.py --port 9100",
+    "ml:text:test": "ml/.venv/Scripts/python.exe -m unittest ml.text.test_service"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",
