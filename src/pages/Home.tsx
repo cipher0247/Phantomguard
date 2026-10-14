@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { api, bandLabel, pct } from '../api';
+import { MockBadge } from '../components';
 import { Card, Icon, kindIcon, RiskBadge, Spinner, ErrorNote, timeAgo, useAsync } from '../ui';
 
 const SERVICES = [['text', 'description', 'Text phishing model'], ['audio', 'mic', 'Voice deepfake model'], ['video', 'videocam', 'Video deepfake model'], ['advisor', 'psychology', 'AI advisor']] as const;
@@ -41,6 +42,7 @@ export function Home() {
       <p className="text-sm text-on-surface-variant leading-relaxed">
         PHANTOMGUARD only evaluates what you submit; it does not monitor your calls or messages in the background.
         {sum.data && ` ${sum.data.last24h.scans} scan${sum.data.last24h.scans === 1 ? '' : 's'} in the last 24 hours.`}
+        {!!sum.data?.mockScans && ` ${sum.data.mockScans} MOCK demo scan${sum.data.mockScans === 1 ? '' : 's'} are excluded from these figures.`}
       </p>
     </Card>
 
@@ -73,7 +75,7 @@ export function Home() {
           <Link key={s.id} to="/activity" className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/40 flex items-start gap-4">
             <span className="w-8 h-8 rounded-lg bg-surface-variant/60 flex items-center justify-center text-primary"><Icon name={kindIcon[s.kind]} className="text-[18px]" /></span>
             <div className="flex-1 min-w-0"><div className="flex justify-between"><span className="text-sm font-bold truncate">{s.label}</span><span className="text-xs text-on-surface-variant">{timeAgo(s.createdAt)}</span></div>
-              <div className="mt-1 flex gap-2 items-center"><RiskBadge risk={s.risk}>{bandLabel(s.score)}</RiskBadge><span className="text-xs text-on-surface-variant">score {pct(s.score)}/100</span></div></div>
+              <div className="mt-1 flex gap-2 items-center">{s.mock ? <MockBadge /> : <RiskBadge risk={s.risk}>{bandLabel(s.score)}</RiskBadge>}<span className="text-xs text-on-surface-variant">score {pct(s.score)}/100</span></div></div>
           </Link>))}
     </div>
   </>);

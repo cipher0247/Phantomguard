@@ -1,6 +1,7 @@
 import { NavLink, Link, Outlet } from 'react-router-dom';
 import { useEffect, useState, type ReactNode } from 'react';
-import type { Risk } from './api';
+import { api, type Risk } from './api';
+import { useKeyboardOpen } from './components';
 
 export const Icon = ({ name, fill, className = '' }: { name: string; fill?: boolean; className?: string }) =>
   <span aria-hidden="true" className={`material-symbols-outlined ${fill ? 'icon-fill' : ''} ${className}`}>{name}</span>;
@@ -10,10 +11,12 @@ export const Wordmark = () => <span className="font-headline text-lg font-semibo
 const NAV = [['/', 'shield', 'Home'], ['/analyze', 'analytics', 'Analyze'], ['/alerts', 'radar', 'Alerts'], ['/activity', 'terminal', 'Activity'], ['/profile', 'manage_accounts', 'Profile']] as const;
 
 export function Shell() {
+  const kb = useKeyboardOpen();
+  const status = useAsync(api.status);
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-dvh flex flex-col bg-background">
       <header className="fixed top-0 inset-x-0 z-40 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(58,48,42,0.04)] pt-safe">
-        <div className="h-16 px-6 flex items-center justify-between max-w-2xl mx-auto">
+        <div className="h-16 px-5 sm:px-6 flex items-center justify-between max-w-2xl mx-auto">
           <Link to="/" className="flex items-center gap-2.5" aria-label="PHANTOMGUARD home">
             <img src="/logo.png" alt="" className="h-8 w-8 rounded-full object-cover" /><Wordmark />
           </Link>
@@ -23,12 +26,18 @@ export function Shell() {
           </div>
         </div>
       </header>
-      <main className="flex-1 w-full max-w-2xl mx-auto px-6 pt-20 pb-28 flex flex-col gap-6"><Outlet /></main>
-      <nav aria-label="Primary" className="fixed bottom-0 inset-x-0 z-40 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/40 pb-safe">
+      <main className={`flex-1 w-full max-w-2xl mx-auto px-5 sm:px-6 pt-[calc(5rem+env(safe-area-inset-top))] ${kb ? 'pb-6' : 'pb-[calc(7rem+env(safe-area-inset-bottom))]'} flex flex-col gap-6`}>
+        {status.data?.demo && (
+          <div role="note" data-testid="demo-banner" className="rounded-xl bg-inverse-surface text-on-primary text-xs text-center font-semibold py-2 px-4">
+            DEMO MODE: any scan results come from a MOCK test service, not an AI model.
+          </div>)}
+        <Outlet />
+      </main>
+      <nav aria-label="Primary" hidden={kb} className="fixed bottom-0 inset-x-0 z-40 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/40 pb-safe">
         <ul className="max-w-2xl mx-auto flex justify-around">
           {NAV.map(([to, icon, label]) => (
             <li key={to}><NavLink to={to} end={to === '/'} className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 min-w-[56px] min-h-[56px] justify-center text-[11px] font-label ${isActive ? 'text-primary font-semibold' : 'text-on-surface-variant'}`}>
+              `flex flex-col items-center gap-0.5 min-w-[56px] min-h-[56px] justify-center text-xs font-label ${isActive ? 'text-primary font-semibold' : 'text-on-surface-variant'}`}>
               {({ isActive }) => <><Icon name={icon} fill={isActive} /><span>{label}</span></>}
             </NavLink></li>
           ))}
@@ -40,7 +49,7 @@ export function Shell() {
 
 const RISK_STYLE: Record<Risk, string> = { high: 'bg-error-container text-error', warning: 'bg-primary-fixed text-primary', low: 'bg-surface-container-high text-on-surface-variant' };
 export const RiskBadge = ({ risk, children }: { risk: Risk; children: ReactNode }) =>
-  <span className={`text-[11px] px-2 py-0.5 rounded font-label font-medium ${RISK_STYLE[risk]}`}>{children}</span>;
+  <span className={`text-xs px-2 py-0.5 rounded font-label font-medium ${RISK_STYLE[risk]}`}>{children}</span>;
 
 export const Card = ({ children, className = '' }: { children: ReactNode; className?: string }) =>
   <section className={`rounded-xl bg-surface-container-low border border-outline-variant/40 p-5 shadow-sm animate-fade-in ${className}`}>{children}</section>;

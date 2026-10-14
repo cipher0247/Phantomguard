@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { Icon, ErrorNote } from '../ui';
+import { ServerStatus } from '../components';
 
 export function SignIn() {
   const { user, ready, signIn } = useAuth();
@@ -25,15 +26,15 @@ export function SignIn() {
     catch (err) { setError((err as Error).message); setBusy(false); }
   };
 
-  const field = 'w-full h-12 pl-11 pr-4 bg-surface-container-lowest rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 shadow-[0_1px_6px_rgba(58,48,42,0.03)]';
+  const field = 'w-full h-12 pl-11 pr-4 bg-surface-container-lowest rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-primary/30 shadow-[0_1px_6px_rgba(58,48,42,0.03)]';
   return (
-    <main className="min-h-screen bg-surface flex flex-col items-center px-6 pt-16 pb-10">
+    <main className="min-h-dvh bg-surface flex flex-col items-center px-5 sm:px-6 pt-[calc(3rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md relative">
         <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-0" />
         <div className="relative flex flex-col items-center text-center mb-8">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high/70 mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[11px] font-label font-medium tracking-wide text-on-surface-variant uppercase">Secure login • PHANTOMGUARD</span>
+            <span className="text-xs font-label font-medium tracking-wide text-on-surface-variant uppercase">Secure login • PHANTOMGUARD</span>
           </span>
           <div className="w-20 h-20 rounded-2xl bg-surface-container-lowest p-2.5 shadow-[0_4px_24px_rgba(58,48,42,0.06)] mb-5">
             <img src="/logo.png" alt="PHANTOMGUARD" className="w-full h-full object-contain rounded-xl" />
@@ -70,7 +71,8 @@ export function SignIn() {
             {busy ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
-        <p className="relative mt-8 text-center text-xs text-on-surface-variant">Need an account? Ask your administrator to create one.</p>
+        <div className="relative mt-6"><ServerStatus startOpen /></div>
+        <p className="relative mt-6 text-center text-xs text-on-surface-variant">Need an account? Ask your administrator to create one.</p>
       </div>
     </main>
   );

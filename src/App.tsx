@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { App as CapApp } from '@capacitor/app';
+import { isNative } from './server';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, RequireAuth } from './auth';
 import { Intro, shouldShowIntro } from './Intro';
@@ -14,6 +16,12 @@ import { Profile } from './pages/Profile';
 export function App() {
   // The app mounts underneath the intro so session check and first paint finish while the video plays.
   const [intro, setIntro] = useState(shouldShowIntro);
+  // Android hardware back: go back in history, otherwise leave the app (instead of an abrupt close mid-flow).
+  useEffect(() => {
+    if (!isNative()) return;
+    const h = CapApp.addListener('backButton', ({ canGoBack }) => (canGoBack ? history.back() : void CapApp.exitApp()));
+    return () => { void h.then((l) => l.remove()); };
+  }, []);
   return (
     <AuthProvider>
       <Routes>

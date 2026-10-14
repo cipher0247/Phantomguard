@@ -6,6 +6,7 @@ import { validateConfig } from './models.js';
 
 try { process.loadEnvFile('.env'); } catch { /* no .env: fine */ }
 validateConfig();
+if (process.env.NODE_ENV === 'production' && process.env.PG_DEMO_MODE === '1') { console.error('Refusing to start: PG_DEMO_MODE must not be enabled in production.'); process.exit(1); }
 const db = openDb();
 // Development accounts (created with an @phantomguard.local address) must never reach production.
 if (process.env.NODE_ENV === 'production') {
@@ -19,4 +20,5 @@ if (existsSync('dist')) { // production: serve the built SPA
   app.get(/^\/(?!api).*/, (_req, res) => res.sendFile('index.html', { root: 'dist' }));
 }
 const port = Number(process.env.PORT ?? 8787);
-app.listen(port, () => console.log(`PHANTOMGUARD API on http://localhost:${port}`));
+const host = process.env.HOST ?? '0.0.0.0'; // reachable from a phone on the same LAN; put HTTPS in front for anything beyond a demo
+app.listen(port, host, () => console.log(`PHANTOMGUARD API on http://localhost:${port}`));

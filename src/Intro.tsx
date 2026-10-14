@@ -69,7 +69,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
         </div>
       )}
       <button onClick={finish}
-        className="absolute right-4 top-4 min-h-[44px] px-4 rounded-full bg-white/15 text-white text-sm font-label backdrop-blur hover:bg-white/25">
+        className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] min-h-[48px] px-4 rounded-full bg-white/15 text-white text-sm font-label backdrop-blur hover:bg-white/25">
         Skip intro
       </button>
     </div>

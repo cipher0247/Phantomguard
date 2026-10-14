@@ -2,8 +2,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { Card, Icon, useAsync } from '../ui';
+import { ServerStatus } from '../components';
 
-const label = 'text-[11px] font-semibold uppercase tracking-widest text-primary px-1';
+const label = 'text-xs font-semibold uppercase tracking-widest text-primary px-1';
 
 export function Profile() {
   const { user, signOut } = useAuth();
@@ -24,6 +25,9 @@ export function Profile() {
         <div key={k} className={`${row} justify-between`}><span className="text-sm font-semibold">{n}</span>
           <span className={`text-xs font-semibold ${m?.[k] ? 'text-primary' : 'text-on-surface-variant'}`}>{m ? (m[k] ? 'Configured' : 'Not configured') : '…'}</span></div>))}
     </Card>
+
+    <h2 className={label}>Backend connection</h2>
+    <Card><ServerStatus /></Card>
 
     <h2 className={label}>Privacy &amp; data</h2>
     <Card className="text-sm text-on-surface-variant space-y-2">

@@ -26,10 +26,12 @@ export function createSession(db: Db, userId: number, remember: boolean) {
 }
 export const destroySession = (db: Db, token?: string) => token && db.prepare('DELETE FROM sessions WHERE token_hash=?').run(sha(token));
 
+export const bearer = (req: Request) => req.get('authorization')?.match(/^Bearer ([a-f0-9]{64})$/)?.[1];
+
 export interface AuthedRequest extends Request { user?: { id: number; email: string; name: string } }
 
 export const requireAuth = (db: Db) => (req: AuthedRequest, res: Response, next: NextFunction) => {
-  const token = req.cookies?.[COOKIE];
+  const token = req.cookies?.[COOKIE] ?? bearer(req);
   const row = token && db.prepare(
     'SELECT u.id,u.email,u.name,s.expires_at e FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=?').get(sha(token)) as any;
   if (!row || row.e < Date.now()) return void res.status(401).json({ error: 'unauthenticated', message: 'Please sign in.' });

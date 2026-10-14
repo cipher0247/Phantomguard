@@ -2,31 +2,37 @@ import { useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api, bandLabel, pct, type Kind, type Scan } from '../api';
 import { Card, ErrorNote, Icon, kindIcon, RiskBadge, useAsync } from '../ui';
+import { MockBadge, MockNotice, ReportButton } from '../components';
 
 const TABS: [Kind, string, string][] = [['text', 'Text', 'description'], ['audio', 'Voice', 'mic'], ['video', 'Video', 'videocam']];
+// Synthetic example messages for demos. They only prefill the box; the result still comes from whichever model is configured.
+const SAMPLES = [['Fake bank alert', 'URGENT: Your account has been suspended. Verify your identity within 24 hours at http://secure-bank-verify.example/login or your funds will be frozen.'], ['Delivery fee scam', 'Your parcel is on hold. Pay a 1.99 redelivery fee at http://parcel-redeliver.example/pay to avoid it being returned.'], ['Ordinary message', 'Hi! Are we still meeting for lunch tomorrow at 1pm? Let me know if you need to move it.']] as const;
 const GUIDANCE = ['Do not click links or open attachments in the message.', 'Contact the supposed sender through a channel you already trust.', 'Report it to your IT/security team or the impersonated service.'];
 
 function Result({ scan }: { scan: Scan }) {
-  const tone = scan.risk === 'high' ? 'bg-error-container/50' : scan.risk === 'warning' ? 'bg-primary-fixed/50' : 'bg-surface-container-low';
+  const tone = scan.mock ? 'bg-surface-container-low' : scan.risk === 'high' ? 'bg-error-container/50' : scan.risk === 'warning' ? 'bg-primary-fixed/50' : 'bg-surface-container-low';
   const details = Object.entries(scan.details ?? {}).filter(([, v]) => ['string', 'number', 'boolean'].includes(typeof v));
   return (<>
+    {scan.mock && <MockNotice />}
     <Card className={`${tone} flex items-center gap-4`} >
       <div className="w-20 h-20 shrink-0 rounded-xl bg-surface-container-lowest flex flex-col items-center justify-center" aria-label={`Score ${pct(scan.score)} out of 100`}>
-        <span className="font-headline text-3xl font-semibold text-primary">{pct(scan.score)}</span><span className="text-[11px] text-on-surface-variant">/100</span>
+        <span className="font-headline text-3xl font-semibold text-primary">{pct(scan.score)}</span><span className="text-xs text-on-surface-variant">/100</span>
       </div>
       <div className="min-w-0 flex-1">
-        <RiskBadge risk={scan.risk}>{bandLabel(scan.score)}</RiskBadge>
+        <div className="flex gap-2 items-center flex-wrap">{scan.mock ? <MockBadge /> : <RiskBadge risk={scan.risk}>{bandLabel(scan.score)}</RiskBadge>}</div>
         <h3 className="font-headline text-xl mt-1 break-words">{scan.label}</h3>
         <p className="text-xs text-on-surface-variant mt-1">Model: {scan.model} (v{scan.version})</p>
       </div>
-      <a href={api.reportUrl(scan.id)} aria-label="Download report" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-surface-container-lowest text-on-surface-variant"><Icon name="download" /></a>
+      <ReportButton id={scan.id} className="shrink-0" />
     </Card>
     <Card>
       <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">How to read this</h4>
-      <p className="text-sm text-on-surface-variant">{scan.limitation ?? 'The score is a probability estimate from a trained model, not proof.'} Higher means the model considers the input more likely to be malicious or synthetic.</p>
+      {scan.mock
+        ? <p className="text-sm text-on-surface-variant">This score is a deterministic placeholder from a test stub (it only reflects message length). It carries no information about whether the message is a scam.</p>
+        : <p className="text-sm text-on-surface-variant">{scan.limitation ?? 'The score is a probability estimate from a trained model, not proof.'} Higher means the model considers the input more likely to be malicious or synthetic.</p>}
       {details.length > 0 && <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">{details.map(([k, v]) => <div key={k} className="rounded-lg bg-surface-container-lowest p-3"><dt className="text-on-surface-variant uppercase tracking-wider">{k}</dt><dd className="font-semibold mt-0.5 break-words">{String(v)}</dd></div>)}</dl>}
     </Card>
-    {scan.risk !== 'low' && <Card>
+    {scan.risk !== 'low' && !scan.mock && <Card>
       <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">General guidance (not model output)</h4>
       <ul className="text-sm text-on-surface-variant list-disc pl-5 space-y-1">{GUIDANCE.map((g) => <li key={g}>{g}</li>)}</ul>
       <Link to="/advisor" className="inline-flex mt-3 text-sm font-semibold text-primary underline underline-offset-4">Ask the AI advisor</Link>
@@ -82,9 +88,11 @@ export function Analyze() {
     <Card>
       {status.data && !available && <div className="mb-4"><ErrorNote message={`The ${tab} model is not configured on this server, so scans cannot run. See README for setup.`} /></div>}
       {tab === 'text' ? (<>
-        <label htmlFor="payload" className="text-[11px] uppercase tracking-widest font-semibold">Payload input</label>
+        <label htmlFor="payload" className="text-xs uppercase tracking-widest font-semibold">Payload input</label>
         <textarea id="payload" value={text} onChange={(e) => setText(e.target.value)} rows={6} maxLength={limits?.text ?? 20000}
-          placeholder="Paste a suspicious email, SMS or message…" className="mt-2 w-full rounded-xl bg-surface-container-lowest p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          placeholder="Paste a suspicious email, SMS or message…" className="mt-2 w-full rounded-xl bg-surface-container-lowest p-4 font-mono text-base focus:outline-none focus:ring-2 focus:ring-primary/30" />
+        {status.data?.demo && <div className="mt-3"><p className="text-xs font-semibold mb-1">Demo samples (synthetic)</p>
+          <div className="flex flex-wrap gap-2">{SAMPLES.map(([n, t]) => <button key={n} type="button" onClick={() => setText(t)} className="min-h-[44px] px-3 rounded-full bg-surface-container text-xs font-semibold">{n}</button>)}</div></div>}
         <p className="text-xs text-on-surface-variant mt-1">{text.length.toLocaleString()} / {(limits?.text ?? 20000).toLocaleString()} characters. Message text is analysed but not stored.</p>
       </>) : (<>
         <input ref={fileInput} type="file" className="sr-only" aria-label={`Choose ${tab} file`} accept={limits?.[tab].exts.map((e) => `.${e}`).join(',')} onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />

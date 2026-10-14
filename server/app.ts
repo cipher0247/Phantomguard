@@ -6,7 +6,7 @@ import { mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Db } from './db.js';
-import { COOKIE, createSession, verifyDummy, destroySession, rateLimit, requireAuth, verifyPassword, type AuthedRequest } from './auth.js';
+import { COOKIE, bearer, createSession, verifyDummy, destroySession, rateLimit, requireAuth, verifyPassword, type AuthedRequest } from './auth.js';
 import { availability, ModelBadResponse, ModelTimeout, ModelUnavailable, runModel, type Kind } from './models.js';
 import { askAdvisor } from './advisor.js';
 
@@ -16,6 +16,8 @@ const LIMITS = {
   video: { bytes: 100 * 1024 * 1024, exts: ['mp4', 'mov', 'webm'] },
 };
 export const RISK = { high: 0.7, warn: 0.4 };
+// Results from the bundled mock service are flagged so the UI can never present them as real predictions.
+const isMock = (model: string) => /^MOCK/i.test(model);
 const riskBand = (s: number) => (s >= RISK.high ? 'high' : s >= RISK.warn ? 'warning' : 'low');
 
 const MAGIC: Record<string, (b: Buffer) => boolean> = {
@@ -46,11 +48,17 @@ export function createApp(db: Db) {
     if (_.path.startsWith('/api')) res.set('Cache-Control', 'no-store');
     next();
   });
-  // CSRF defence in depth (cookie is also SameSite=Lax): reject cross-origin state-changing requests.
+  // Cross-origin policy. The Android app (Capacitor WebView) runs at https://localhost and authenticates with a Bearer token,
+  // never cookies, so CORS is granted without credentials and only to this allow-list.
+  const allowed = new Set(['https://localhost', 'http://localhost', 'capacitor://localhost', ...(process.env.PG_ALLOWED_ORIGINS ?? '').split(',').filter(Boolean)]);
   app.use('/api', (req, res, next) => {
     const o = req.get('origin');
-    if (req.method !== 'GET' && o && new URL(o).host !== req.get('host') && !(process.env.PG_ALLOWED_ORIGINS ?? '').split(',').includes(o))
-      return void res.status(403).json({ error: 'forbidden_origin', message: 'Cross-origin request blocked.' });
+    const sameOrigin = !o || new URL(o).host === req.get('host');
+    if (!sameOrigin && !allowed.has(o!)) return void res.status(403).json({ error: 'forbidden_origin', message: 'Cross-origin request blocked.' });
+    if (!sameOrigin) {
+      res.set({ 'Access-Control-Allow-Origin': o!, Vary: 'Origin', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Max-Age': '600' });
+      if (req.method === 'OPTIONS') return void res.status(204).end();
+    }
     next();
   });
   const auth = requireAuth(db);
@@ -58,7 +66,7 @@ export function createApp(db: Db) {
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
   app.post('/api/auth/login', rateLimit(10, 60_000), (req, res) => {
-    const p = z.object({ email: z.string().email().max(200), password: z.string().min(1).max(200), remember: z.boolean().optional() }).safeParse(req.body);
+    const p = z.object({ email: z.string().email().max(200), password: z.string().min(1).max(200), remember: z.boolean().optional(), client: z.enum(['web', 'native']).optional() }).safeParse(req.body);
     if (!p.success) return void res.status(400).json({ error: 'invalid_input', message: 'Enter a valid email and password.' });
     const u = db.prepare('SELECT * FROM users WHERE email=?').get(p.data.email.toLowerCase()) as any;
     // Same message for unknown user and bad password to avoid account enumeration.
@@ -66,19 +74,22 @@ export function createApp(db: Db) {
     if (!u || !verifyPassword(p.data.password, u.pw_hash))
       return void res.status(401).json({ error: 'bad_credentials', message: 'Incorrect email or password.' });
     const { token, ttl } = createSession(db, u.id, !!p.data.remember);
+    const user = { email: u.email, name: u.name };
+    // Native clients (cross-origin WebView) get a Bearer token in the body; browsers keep the httpOnly cookie.
+    if (p.data.client === 'native') return void res.json({ user, token, expiresInMs: ttl });
     res.cookie(COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: ttl, path: '/' });
-    res.json({ user: { email: u.email, name: u.name } });
+    res.json({ user });
   });
-  app.post('/api/auth/logout', (req, res) => { destroySession(db, req.cookies?.[COOKIE]); res.clearCookie(COOKIE, { path: '/' }); res.json({ ok: true }); });
+  app.post('/api/auth/logout', (req, res) => { destroySession(db, req.cookies?.[COOKIE] ?? bearer(req)); res.clearCookie(COOKIE, { path: '/' }); res.json({ ok: true }); });
   app.get('/api/auth/me', auth, (req: AuthedRequest, res) => res.json({ user: req.user }));
 
-  app.get('/api/status', auth, (_req, res) => res.json({ models: availability(), limits: LIMITS }));
+  app.get('/api/status', auth, (_req, res) => res.json({ models: availability(), limits: LIMITS, demo: process.env.PG_DEMO_MODE === '1' }));
 
   const save = (userId: number, kind: Kind, r: { score: number; label: string; model: string; version: string; details?: unknown }, meta: object) => {
     const created = new Date().toISOString();
     const info = db.prepare('INSERT INTO scans (user_id,kind,label,score,model,model_version,details,input_meta,created_at) VALUES (?,?,?,?,?,?,?,?,?)')
       .run(userId, kind, r.label, r.score, r.model, r.version, JSON.stringify(r.details ?? {}), JSON.stringify(meta), created);
-    return { id: Number(info.lastInsertRowid), kind, ...r, risk: riskBand(r.score), createdAt: created };
+    return { id: Number(info.lastInsertRowid), kind, ...r, mock: isMock(r.model), risk: riskBand(r.score), createdAt: created };
   };
   const fail = (res: express.Response, e: unknown) => {
     if (e instanceof ModelTimeout) return void res.status(504).json({ error: 'model_timeout', message: e.message });
@@ -126,7 +137,7 @@ export function createApp(db: Db) {
   app.post('/api/scan/audio', auth, uploadOne('audio'), fileScan('audio'));
   app.post('/api/scan/video', auth, uploadOne('video'), fileScan('video'));
 
-  const row = (r: any) => ({ id: r.id, kind: r.kind, label: r.label, score: r.score, risk: riskBand(r.score), model: r.model, version: r.model_version,
+  const row = (r: any) => ({ mock: isMock(r.model), id: r.id, kind: r.kind, label: r.label, score: r.score, risk: riskBand(r.score), model: r.model, version: r.model_version,
     details: JSON.parse(r.details), input: JSON.parse(r.input_meta), createdAt: r.created_at });
   app.get('/api/scans', auth, (req: AuthedRequest, res) => {
     const kind = z.enum(['text', 'audio', 'video']).optional().safeParse(req.query.kind);
@@ -143,9 +154,10 @@ export function createApp(db: Db) {
   });
   app.get('/api/summary', auth, (req: AuthedRequest, res) => {
     const u = req.user!.id;
-    const t = db.prepare('SELECT COUNT(*) total, COALESCE(SUM(score>=?),0) high, MAX(created_at) last FROM scans WHERE user_id=?').get(RISK.high, u) as any;
-    const d = db.prepare('SELECT COUNT(*) n, MAX(score) maxScore FROM scans WHERE user_id=? AND created_at>?').get(u, new Date(Date.now() - 86_400_000).toISOString()) as any;
-    res.json({ totalScans: t.total, highRisk: t.high, lastScanAt: t.last, last24h: { scans: d.n, maxScore: d.maxScore } });
+    // Scans from the MOCK service are counted separately and never feed risk figures.
+    const t = db.prepare("SELECT COUNT(*) total, COALESCE(SUM(score>=? AND model NOT LIKE 'MOCK%'),0) high, COALESCE(SUM(model LIKE 'MOCK%'),0) mock, MAX(created_at) last FROM scans WHERE user_id=?").get(RISK.high, u) as any;
+    const d = db.prepare("SELECT COUNT(*) n, MAX(score) maxScore FROM scans WHERE user_id=? AND model NOT LIKE 'MOCK%' AND created_at>?").get(u, new Date(Date.now() - 86_400_000).toISOString()) as any;
+    res.json({ totalScans: t.total, mockScans: t.mock, highRisk: t.high, lastScanAt: t.last, last24h: { scans: d.n, maxScore: d.maxScore } });
   });
 
   app.post('/api/advisor', auth, rateLimit(20, 60_000), async (req, res) => {
