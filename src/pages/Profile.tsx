@@ -28,7 +28,7 @@ export function Profile() {
     <h2 className={label}>Privacy &amp; data</h2>
     <Card className="text-sm text-on-surface-variant space-y-2">
       <p>Uploaded audio and video are processed in temporary storage and deleted immediately after analysis.</p>
-      <p>Scan history keeps only the score, label, model name and basic metadata (file name and size, or text length and a one-way hash). Message text is never saved.</p>
+      <p>Scan history keeps only the score, label, model name and basic metadata (file name and size, or text length). Message text is never saved, not even as a hash.</p>
     </Card>
 
     <h2 className={label}>Help</h2>

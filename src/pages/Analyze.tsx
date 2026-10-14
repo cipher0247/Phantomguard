@@ -17,7 +17,7 @@ function Result({ scan }: { scan: Scan }) {
       <div className="min-w-0 flex-1">
         <RiskBadge risk={scan.risk}>{bandLabel(scan.score)}</RiskBadge>
         <h3 className="font-headline text-xl mt-1 break-words">{scan.label}</h3>
-        <p className="text-xs text-on-surface-variant mt-1">Model: {scan.model}</p>
+        <p className="text-xs text-on-surface-variant mt-1">Model: {scan.model} (v{scan.version})</p>
       </div>
       <a href={api.reportUrl(scan.id)} aria-label="Download report" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-surface-container-lowest text-on-surface-variant"><Icon name="download" /></a>
     </Card>

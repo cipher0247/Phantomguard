@@ -4,3 +4,18 @@ dist
 data/
 *.db
 
+.env.*
+!.env.example
+uploads/
+models/
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.ckpt
+*.pkl
+*.joblib
+datasets/
+predictions/
+*.pem
+*.key

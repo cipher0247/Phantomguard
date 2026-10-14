@@ -1,24 +1,45 @@
 // Model adapters. No trained weights ship with this repo: each modality talks to an inference
-// service YOU run (PG_*_MODEL_URL). Contract: POST JSON/multipart -> { score:0..1, label:string, model:string, details?:object }
+// service you run (PG_*_MODEL_URL). See README "Model service contract".
 export type Kind = 'text' | 'audio' | 'video';
-export interface ModelResult { score: number; label: string; model: string; details?: Record<string, unknown> }
+export interface ModelResult { score: number; label: string; model: string; version: string; details: Record<string, string | number | boolean> }
+
+/** Service not configured, unreachable or erroring -> 503. */
 export class ModelUnavailable extends Error {}
+/** Service did not answer within PG_MODEL_TIMEOUT_MS -> 504. */
+export class ModelTimeout extends Error {}
+/** Service answered with something that violates the contract -> 502. */
+export class ModelBadResponse extends Error {}
 
-const URLS: Record<Kind, string> = {
-  get text() { return process.env.PG_TEXT_MODEL_URL ?? ''; },
-  get audio() { return process.env.PG_AUDIO_MODEL_URL ?? ''; },
-  get video() { return process.env.PG_VIDEO_MODEL_URL ?? ''; },
-};
-export const availability = () => ({ text: !!URLS.text, audio: !!URLS.audio, video: !!URLS.video, advisor: !!process.env.ANTHROPIC_API_KEY });
+const ENV: Record<Kind, string> = { text: 'PG_TEXT_MODEL_URL', audio: 'PG_AUDIO_MODEL_URL', video: 'PG_VIDEO_MODEL_URL' };
+const urlOf = (k: Kind) => process.env[ENV[k]] ?? '';
+const timeoutMs = (k: Kind) => Number(process.env.PG_MODEL_TIMEOUT_MS) || (k === 'text' ? 15_000 : 120_000);
 
-function parse(j: any): ModelResult {
-  if (!j || typeof j.score !== 'number' || j.score < 0 || j.score > 1 || typeof j.label !== 'string')
-    throw new Error('Model service returned an invalid response');
-  return { score: j.score, label: j.label.slice(0, 80), model: String(j.model ?? 'unknown').slice(0, 80), details: j.details };
+export const availability = () => ({ text: !!urlOf('text'), audio: !!urlOf('audio'), video: !!urlOf('video'), advisor: !!process.env.ANTHROPIC_API_KEY });
+
+/** Fail fast at startup on a malformed model URL (operator-supplied; must be http/https). */
+export function validateConfig() {
+  for (const k of Object.keys(ENV) as Kind[]) {
+    const u = urlOf(k);
+    if (u && !/^https?:$/.test(new URL(u).protocol)) throw new Error(`${ENV[k]} must be an http(s) URL`);
+  }
+}
+
+const str = (v: unknown, max: number) => typeof v === 'string' && v.length > 0 && v.length <= max;
+
+export function parseModelResponse(j: any): ModelResult {
+  if (!j || typeof j !== 'object' || typeof j.score !== 'number' || !Number.isFinite(j.score) || j.score < 0 || j.score > 1
+    || !str(j.label, 80) || !str(j.model, 80) || !str(j.version, 40))
+    throw new ModelBadResponse('The model service returned an invalid response.');
+  // Only flat, short primitives are kept: details are shown to users and stored, so they must not carry large or nested payloads.
+  const details: ModelResult['details'] = {};
+  if (j.details && typeof j.details === 'object' && !Array.isArray(j.details))
+    for (const [k, v] of Object.entries(j.details).slice(0, 10))
+      if (k.length <= 40 && (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && v.length <= 200))) details[k] = v as never;
+  return { score: j.score, label: j.label, model: j.model, version: j.version, details };
 }
 
 export async function runModel(kind: Kind, body: { text: string } | { file: Buffer; filename: string; mime: string }): Promise<ModelResult> {
-  const url = URLS[kind];
+  const url = urlOf(kind);
   if (!url) throw new ModelUnavailable(`The ${kind} model is not configured on this server.`);
   let init: RequestInit;
   if ('text' in body) init = { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: body.text }) };
@@ -28,8 +49,16 @@ export async function runModel(kind: Kind, body: { text: string } | { file: Buff
     init = { method: 'POST', body: fd };
   }
   let res: Response;
-  try { res = await fetch(url, { ...init, signal: AbortSignal.timeout(120_000) }); }
-  catch { throw new ModelUnavailable(`The ${kind} model service is unreachable.`); }
+  try { res = await fetch(url, { ...init, redirect: 'error', signal: AbortSignal.timeout(timeoutMs(kind)) }); }
+  catch (e) {
+    if ((e as Error).name === 'TimeoutError') throw new ModelTimeout(`The ${kind} model took too long to respond.`);
+    throw new ModelUnavailable(`The ${kind} model service is unreachable.`);
+  }
   if (!res.ok) throw new ModelUnavailable(`The ${kind} model service failed (${res.status}).`);
-  return parse(await res.json());
+  let j: unknown;
+  try { j = await res.json(); } catch (e) {
+    if ((e as Error).name === 'TimeoutError') throw new ModelTimeout(`The ${kind} model took too long to respond.`);
+    throw new ModelBadResponse('The model service returned an invalid response.');
+  }
+  return parseModelResponse(j);
 }

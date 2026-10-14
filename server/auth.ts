@@ -11,11 +11,14 @@ export const verifyPassword = (pw: string, stored: string) => {
   const a = Buffer.from(hash, 'hex'), b = scryptSync(pw, Buffer.from(salt, 'hex'), 64);
   return a.length === b.length && timingSafeEqual(a, b);
 };
+const DUMMY = hashPassword('dummy-password-for-timing');
+export const verifyDummy = (pw: string) => verifyPassword(pw, DUMMY);
 const sha = (s: string) => createHash('sha256').update(s).digest('hex');
 export const COOKIE = 'pg_session';
 const DAY = 86_400_000;
 
 export function createSession(db: Db, userId: number, remember: boolean) {
+  db.prepare('DELETE FROM sessions WHERE expires_at < ?').run(Date.now()); // purge expired sessions
   const token = randomBytes(32).toString('hex');
   const ttl = remember ? 30 * DAY : DAY;
   db.prepare('INSERT INTO sessions VALUES (?,?,?)').run(sha(token), userId, Date.now() + ttl);

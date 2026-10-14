@@ -1,7 +1,7 @@
 export type Kind = 'text' | 'audio' | 'video';
 export type Risk = 'low' | 'warning' | 'high';
 export interface User { email: string; name: string }
-export interface Scan { id: number; kind: Kind; label: string; score: number; risk: Risk; model: string; details: Record<string, unknown>;
+export interface Scan { id: number; kind: Kind; label: string; score: number; risk: Risk; model: string; version: string; details: Record<string, unknown>;
   input: Record<string, unknown>; createdAt: string; limitation?: string }
 export interface Status { models: Record<Kind | 'advisor', boolean>;
   limits: { text: number; audio: { bytes: number; exts: string[]; maxSeconds: number }; video: { bytes: number; exts: string[] } } }

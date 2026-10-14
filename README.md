@@ -7,11 +7,11 @@ Vite + React + TypeScript frontend, Express + SQLite (`node:sqlite`) backend. No
 ```bash
 npm install
 cp .env.example .env            # optional: add keys / model URLs
-PG_NEW_PASSWORD='choose-a-password' npm run create-user -- you@example.com "Your Name"
+PG_NEW_PASSWORD='choose-a-long-password' npm run create-user -- <your-email> "Your Name"
 npm run dev                     # web http://localhost:5173, API :8787
 ```
 
-Production: `npm run build && NODE_ENV=production npm start` (serves `dist/` and the API on :8787; set up HTTPS in front).
+Production: `npm run build && NODE_ENV=production npm start` (serves `dist/` and the API on :8787; put HTTPS in front).
 Tests: `npm test`. Type-check + build: `npm run build`.
 
 ## What is real vs. awaiting configuration
@@ -23,10 +23,33 @@ Tests: `npm test`. Type-check + build: `npm run build`.
 | AI advisor | Needs `ANTHROPIC_API_KEY`; replies are labelled AI-generated. |
 
 ### Model service contract
-`text`: `POST` JSON `{text}`. `audio`/`video`: `POST` multipart field `file`.
-Response: `{ "score": 0..1, "label": "string", "model": "name", "details": {optional flat object} }`.
-Score is the model's probability that the input is malicious/synthetic. Risk bands: ≥0.4 warning, ≥0.7 high, ≥0.9 critical.
-Video frame extraction, audio decoding and duration enforcement belong in your model service (only WAV duration and file size/type are checked here).
+
+`text`: `POST` JSON `{"text": "..."}` (max 20,000 chars). `audio` / `video`: `POST` multipart field `file`.
+
+Response. Every field except `details` is required; otherwise the scan fails with 502 and nothing is stored:
+
+```json
+{ "score": 0.0, "label": "string (<=80)", "model": "name (<=80)", "version": "string (<=40)", "details": { "optional": "flat primitives, <=10 keys" } }
+```
+
+**Score semantics:** the model's probability (0–1) that the input is malicious/synthetic. This app does not calibrate it. Risk bands are fixed (>=0.4 warning, >=0.7 high, >=0.9 critical); tune them against your model's measured precision/recall before trusting them.
+
+**Errors:** unconfigured / unreachable / non-2xx → 503; timeout (`PG_MODEL_TIMEOUT_MS`, default 15 s text) → 504; contract violation → 502. Redirects are refused.
+
+Video frame extraction, audio decoding and duration enforcement belong in your model service (only WAV duration, size and file signature are checked here).
+
+**Mock service:** `npm run mock:text` starts a deterministic MOCK on :9001 (score = text length / 100, labelled "MOCK", **not a detector**) for wiring checks only. Never use it in production.
+
+## Secure configuration & cleanup checklist
+
+- [ ] `.env` exists only on the server and is never committed (git-ignored, along with `data/`, `*.db`, uploads, models, datasets, keys).
+- [ ] `NODE_ENV=production`, served over HTTPS (the session cookie is `Secure` in production); `PG_TRUST_PROXY` set if behind a proxy.
+- [ ] Create real accounts with a long password via `PG_NEW_PASSWORD` (never argv). The server **refuses to start in production** while any `@phantomguard.local` account exists.
+- [ ] Remove dev/test accounts: `npm run delete-user -- <email>` (also deletes their sessions and scans). To wipe local data entirely, stop the server and delete `data/`.
+- [ ] Rotate any API key that was ever pasted into a terminal, chat or screenshot.
+- [ ] Model weights, datasets and predictions live outside the repo (or in git-ignored paths) and are served by a separate inference service.
+- [ ] `npm audit` reports build-time-only advisories in Tailwind 3's dependency tree (braces/chokidar). They are not in the runtime server or the shipped bundle; fixing them means a Tailwind 4 migration.
 
 ## Privacy
-Uploads go to a temp dir and are deleted after each request. History stores score/label/model and metadata only (file name+size, or text length+SHA-256); never message text.
+
+Uploads go to a temp dir and are deleted after each request (the dir is emptied at startup). History stores score, label, model name/version and metadata only (file name + size, or text length); never message text, not even a hash.

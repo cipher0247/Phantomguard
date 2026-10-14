@@ -13,6 +13,9 @@ export function openDb(path = process.env.PG_DB ?? 'data/phantomguard.db') {
       input_meta TEXT NOT NULL, created_at TEXT NOT NULL);
     CREATE INDEX IF NOT EXISTS scans_user ON scans(user_id, id DESC);
   `);
+  // Migration for databases created before model versions were recorded.
+  if (!(db.prepare('PRAGMA table_info(scans)').all() as any[]).some((c) => c.name === 'model_version'))
+    db.exec("ALTER TABLE scans ADD COLUMN model_version TEXT NOT NULL DEFAULT 'unknown'");
   return db;
 }
 export type Db = ReturnType<typeof openDb>;

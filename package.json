@@ -9,7 +9,9 @@
     "build": "tsc --noEmit && vite build",
     "start": "tsx server/index.ts",
     "create-user": "tsx server/create-user.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "delete-user": "tsx server/delete-user.ts",
+    "mock:text": "tsx tests/fixtures/mock-text-model.ts"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
