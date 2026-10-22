@@ -31,7 +31,7 @@ describe('text model integration (mock service)', () => {
     const r = await a.post('/api/scan/text').send({ text: secret });
     expect(r.status).toBe(200);
     expect(r.body).toMatchObject({ kind: 'text', model: MOCK_MODEL, version: 'mock-0', score: secret.length / 100 });
-    expect(r.body.limitation).toMatch(/probability/);
+    expect(r.body.limitation).toMatch(/not proof/i);
     const raw = JSON.stringify(db.prepare('SELECT * FROM scans').all());
     expect(raw).not.toContain('4921'); expect(raw).not.toContain('bank');
     expect(JSON.parse((db.prepare('SELECT input_meta m FROM scans').get() as any).m)).toEqual({ chars: secret.length });

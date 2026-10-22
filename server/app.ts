@@ -12,7 +12,7 @@ import { askAdvisor } from './advisor.js';
 
 const LIMITS = {
   text: 20_000,
-  audio: { bytes: 20 * 1024 * 1024, exts: ['wav', 'mp3', 'm4a', 'ogg', 'flac'], maxSeconds: 300 },
+  audio: { bytes: 20 * 1024 * 1024, exts: ['wav', 'mp3', 'm4a', 'ogg', 'flac', 'aac', 'amr', 'opus'], maxSeconds: 300 },
   video: { bytes: 100 * 1024 * 1024, exts: ['mp4', 'mov', 'webm'] },
 };
 export const RISK = { high: 0.7, warn: 0.4 };
@@ -31,6 +31,9 @@ const MAGIC: Record<string, (b: Buffer) => boolean> = {
   wav: (b) => b.toString('ascii', 0, 4) === 'RIFF' && b.toString('ascii', 8, 12) === 'WAVE',
   mp3: (b) => b.toString('ascii', 0, 3) === 'ID3' || (b[0] === 0xff && (b[1] & 0xe0) === 0xe0),
   ogg: (b) => b.toString('ascii', 0, 4) === 'OggS',
+  opus: (b) => b.toString('ascii', 0, 4) === 'OggS',
+  aac: (b) => b[0] === 0xff && (b[1] & 0xf6) === 0xf0, // ADTS frame header
+  amr: (b) => b.toString('ascii', 0, 5) === '#!AMR',
   flac: (b) => b.toString('ascii', 0, 4) === 'fLaC',
   m4a: (b) => b.toString('ascii', 4, 8) === 'ftyp',
   mp4: (b) => b.toString('ascii', 4, 8) === 'ftyp',
@@ -106,7 +109,7 @@ export function createApp(db: Db) {
     console.error(e);
     res.status(500).json({ error: 'scan_failed', message: 'The scan could not be completed.' });
   };
-  const LIMITATION = 'Model score is a probability estimate, not proof. False positives and negatives occur.';
+  const LIMITATION = 'Model output is not proof. False positives and negatives occur.';
 
   app.post('/api/scan/text', auth, async (req: AuthedRequest, res) => {
     const p = z.object({ text: z.string().trim().min(1).max(LIMITS.text) }).safeParse(req.body);
@@ -149,7 +152,9 @@ export function createApp(db: Db) {
     details: JSON.parse(r.details), input: JSON.parse(r.input_meta), createdAt: r.created_at });
   app.get('/api/scans', auth, (req: AuthedRequest, res) => {
     const kind = z.enum(['text', 'audio', 'video']).optional().safeParse(req.query.kind);
-    const limit = Math.min(Number(req.query.limit) || 50, 200), before = Number(req.query.before) || 1e15;
+    const requestedLimit = Number(req.query.limit), requestedBefore = Number(req.query.before);
+    const limit = Number.isSafeInteger(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 200) : 50;
+    const before = Number.isSafeInteger(requestedBefore) && requestedBefore > 0 ? requestedBefore : 1e15;
     const rows = db.prepare(`SELECT * FROM scans WHERE user_id=? AND id<? ${kind.data ? 'AND kind=?' : ''} ORDER BY id DESC LIMIT ?`)
       .all(...[req.user!.id, before, ...(kind.data ? [kind.data] : []), limit]) as any[];
     res.json({ scans: rows.map(row) });
@@ -167,14 +172,16 @@ export function createApp(db: Db) {
   });
   app.get('/api/summary', auth, (req: AuthedRequest, res) => {
     const u = req.user!.id;
-    // Scans from the MOCK service are counted separately and never feed risk figures.
+    // MOCK and explicitly experimental results are recorded but never feed security figures.
     // Computed in JS so each model's own threshold (see riskBand) is respected; history per user is small.
     const all = db.prepare('SELECT score, model, details, created_at FROM scans WHERE user_id=?').all(u) as any[];
-    const real = all.filter((r) => !isMock(r.model));
+    const mock = all.filter((r) => isMock(r.model));
+    const experimental = all.filter((r) => JSON.parse(r.details).experimental === true);
+    const real = all.filter((r) => !isMock(r.model) && JSON.parse(r.details).experimental !== true);
     const since = new Date(Date.now() - 86_400_000).toISOString();
     const recent = real.filter((r) => r.created_at > since);
     res.json({
-      totalScans: all.length, mockScans: all.length - real.length,
+      totalScans: all.length, mockScans: mock.length, experimentalScans: experimental.filter((r) => !isMock(r.model)).length,
       highRisk: real.filter((r) => riskBand(r.score, JSON.parse(r.details)) === 'high').length,
       flagged: real.filter((r) => riskBand(r.score, JSON.parse(r.details)) !== 'low').length, // suspicious: warning or high
       lastScanAt: all.reduce<string | null>((m, r) => (!m || r.created_at > m ? r.created_at : m), null),

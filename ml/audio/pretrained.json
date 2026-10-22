@@ -1,0 +1,16 @@
+{
+  "model": "pg-audio-melodymachine-pretrained",
+  "version": "0.1.0-experimental",
+  "threshold": 0.5,
+  "model_sha256": "997d9ce59e63151d5e444a6fa7c863986d0e56d515f67321bd705ac3b01bc38c",
+  "fake_index": 0,
+  "label_mapping": {
+    "0": "genuine",
+    "1": "synthetic"
+  },
+  "backbone": {
+    "id": "MelodyMachine/Deepfake-audio-detection-V2",
+    "revision": "de3cde5a29c449bb5268814e421b46bf6ebdcd72"
+  },
+  "limitations": "EXPERIMENTAL: On an 80-clip quick evaluation, ROC-AUC was 0.516, accuracy 56.3%, synthetic-voice recall 6.1%, and genuine-voice specificity 91.5% at threshold 0.5. This small sample is not a reliable performance estimate; the model missed most synthetic clips. Do not use its result to decide whether to trust a caller."
+}

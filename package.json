@@ -18,7 +18,13 @@
     "android:open": "cap open android",
     "ml:text:train": "ml/.venv/Scripts/python.exe ml/text/train.py",
     "ml:text:serve": "ml/.venv/Scripts/python.exe ml/text/serve.py --port 9100",
-    "ml:text:test": "ml/.venv/Scripts/python.exe -m unittest ml.text.test_service"
+    "ml:text:test": "ml/.venv/Scripts/python.exe -m unittest ml.text.test_service",
+    "ml:audio:train": "ml/.venv/Scripts/python.exe ml/audio/train.py",
+    "ml:audio:serve": "ml/.venv/Scripts/python.exe ml/audio/serve.py --port 9200",
+    "ml:audio:test": "ml/.venv/Scripts/python.exe -m unittest ml.audio.test_service",
+    "ml:video:serve": "ml/.venv/Scripts/python.exe ml/video/serve.py --port 9300",
+    "ml:video:test": "ml/.venv/Scripts/python.exe -m unittest ml.video.test_service",
+    "start:all": "powershell -ExecutionPolicy Bypass -File scripts/start-all.ps1"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",

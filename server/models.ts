@@ -16,7 +16,7 @@ const ENV: Record<Kind, string> = { text: 'PG_TEXT_MODEL_URL', audio: 'PG_AUDIO_
 const urlOf = (k: Kind) => process.env[ENV[k]] ?? '';
 const timeoutMs = (k: Kind) => Number(process.env.PG_MODEL_TIMEOUT_MS) || (k === 'text' ? 15_000 : 120_000);
 
-export const availability = () => ({ text: !!urlOf('text'), audio: !!urlOf('audio'), video: !!urlOf('video'), advisor: !!process.env.ANTHROPIC_API_KEY });
+export const availability = () => ({ text: !!urlOf('text'), audio: !!urlOf('audio'), video: !!urlOf('video'), advisor: !!(process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY) });
 
 /** Fail fast at startup on a malformed model URL (operator-supplied; must be http/https). */
 export function validateConfig() {
@@ -32,10 +32,10 @@ export function parseModelResponse(j: any): ModelResult {
   if (!j || typeof j !== 'object' || typeof j.score !== 'number' || !Number.isFinite(j.score) || j.score < 0 || j.score > 1
     || !str(j.label, 80) || !str(j.model, 80) || !str(j.version, 40))
     throw new ModelBadResponse('The model service returned an invalid response.');
-  // Only flat, short primitives are kept: details are shown to users and stored, so they must not carry large or nested payloads.
+  // Only flat, bounded primitives are kept: details are shown to users and stored, so they must not carry large or nested payloads.
   const details: ModelResult['details'] = {};
   if (j.details && typeof j.details === 'object' && !Array.isArray(j.details))
-    for (const [k, v] of Object.entries(j.details).slice(0, 10))
+    for (const [k, v] of Object.entries(j.details).slice(0, 16))
       if (k.length <= 40 && (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && v.length <= (k === 'limitations' ? 500 : 200)))) details[k] = v as never;
   return { score: j.score, label: j.label, model: j.model, version: j.version, details };
 }

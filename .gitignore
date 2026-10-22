@@ -23,3 +23,7 @@ ml/.venv/
 ml/text/data/
 __pycache__/
 *.pyc
+ml/video/data/
+ml/audio/artifacts/emb_*.npy
+ml/audio/artifacts/scores_*.json
+ml/.cache/

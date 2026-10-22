@@ -1,0 +1,715 @@
+{
+  "dataset": "angads24/deepfake-video",
+  "dataset_url": "https://huggingface.co/datasets/angads24/deepfake-video/tree/3470af66b50e6d715f108bdfa67342907137e1f4",
+  "dataset_revision": "3470af66b50e6d715f108bdfa67342907137e1f4",
+  "split": "unknown",
+  "license_declared": "cc-by-sa-4.0",
+  "label_source": "real/fake source-folder assignment recorded in the downloaded dataset manifest",
+  "provenance_status": "unknown (empty dataset card)",
+  "class_counts": {
+    "real": 50,
+    "fake": 50
+  },
+  "items": [
+    {
+      "file_id": "real/16__exit_phone_room.mp4",
+      "sha256": "97a8cee1435edbed6012e6bcab705ba000281ec09d41fce8420d0f34fe2af364",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/09__podium_speech_happy.mp4",
+      "sha256": "025b786117ccbe704c42124aab355d39c86a90c2337711842a926b0c47aadd90",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/02__walking_down_indoor_hall_disgust.mp4",
+      "sha256": "4be99c30e34165886577c35d9b7e15cbbc81e26bad32ac3be55760e3fea07177",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/01__hugging_happy.mp4",
+      "sha256": "ec93a5bdafd423708a089b67d11f3921339abbaca2456d9482beb463aa219e3a",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/02__podium_speech_happy.mp4",
+      "sha256": "9ec2b12dd3ffcbace49246d7eb882cbc6bace45ed94c659c53aab4a197d61274",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/12__talking_angry_couch.mp4",
+      "sha256": "1a31a41314b612cadcbf8fca9903d00e13c9627f3f6b0a634be3cd7a73a3b194",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/01__secret_conversation.mp4",
+      "sha256": "d7b3fcd36c225b946399ae679117793792dffca3856ffc910a2d053e1e3152d6",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/14__hugging_happy.mp4",
+      "sha256": "ba1e319fc85ae13f8d12d59dfca8e65ffef2e0f4a948fe0aad8e0e141473cbf9",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/14__secret_conversation.mp4",
+      "sha256": "329b6d3e17ed4a1214b92cf47306fb29573aa68bd33111b5708c79a98a4991f0",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/02__outside_talking_pan_laughing.mp4",
+      "sha256": "9c8f08a9f7d4c1cb3dabe15497a480269b7f6fcb204aacf304e5268a8e11d228",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/02__talking_against_wall.mp4",
+      "sha256": "d3cfb972816f5e92f9e2e1265e8ae2966f9f89bd1bfafac3b4f023790b5a1d13",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/07__outside_talking_still_laughing.mp4",
+      "sha256": "5b60d349f31e2386a306eacade41a20a28ac06d58e8ea7429ff5d3eaef9976e9",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/05__exit_phone_room.mp4",
+      "sha256": "0f56bc04800f67334d8642abeca34e34a944c8619afc6b6d476f74dc638fc9a7",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/01__meeting_serious.mp4",
+      "sha256": "40cfad5d3c5268d2a9bbe53151f44d9338812f7fd0e5eba696ee0c224398ef0b",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/01__podium_speech_happy.mp4",
+      "sha256": "14dcf511051295593e61d65d8a7bdfd37c68dd549255e754ca00c7a9edd1d3d0",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/15__hugging_happy.mp4",
+      "sha256": "2ae26f2fa3b72756e3500c6f06bd137ae92ae5b1925eadabaca07e88ea204195",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/07__kitchen_still.mp4",
+      "sha256": "320b197bd23358972abc1e9a8fb83d31156d084d74b995231a782fdddfe832eb",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/13__walk_down_hall_angry.mp4",
+      "sha256": "678b993e17d80c9de901eeb6771dddf4658310cf77c90258488460cf3d3fd827",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/13__outside_talking_pan_laughing.mp4",
+      "sha256": "0d4eaf184c70fb106412b40fc226369d6059d137b023a3f487a2b84398f73d02",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/10__talking_against_wall.mp4",
+      "sha256": "05a98b80ec25c6954a43616e4ee82c64cf4bd845e5a89219830ad5d9dd4b232d",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/13__kitchen_pan.mp4",
+      "sha256": "3b93df1d268773e237ecd229b340dbedffc492f83efa069a245e061e01cb9db2",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/10__kitchen_pan.mp4",
+      "sha256": "9b71074afc078f085229d42ca27a0babbc51a9cd71e215548033156e936baff9",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/03__outside_talking_still_laughing.mp4",
+      "sha256": "bf77934191dc58cc9126717ee49cd5ada66b5c8ec59c607666e3cfaee447c4a7",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/15__walking_and_outside_surprised.mp4",
+      "sha256": "8fc7b95d712dcf80502aaa36ec1b6e393bfa125939317e474321fd13e226a3f1",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/03__walking_down_street_outside_angry.mp4",
+      "sha256": "dfd559957ed75ef8845c56bc3f9b2340560f8e2c612344c4223fe1b175dd9041",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/15__walking_down_street_outside_angry.mp4",
+      "sha256": "93029bd7b7849fdc63c09f575f48405e6608efb5b4f4c30b5ced103446b3b27c",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/01__kitchen_still.mp4",
+      "sha256": "05ba882294ee4d7f1010344dcfb69627a5eb5f861345ffcb43d757f5953cb69d",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/11__exit_phone_room.mp4",
+      "sha256": "7233e3aec1f60698835e01e3a515930eb3ab1e193081debce6642faec5efbc42",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/10__talking_angry_couch.mp4",
+      "sha256": "a73b3c3f0235d1c056e207110d53743806a29b65333109f00c4e220da4c4dde7",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/05__kitchen_still.mp4",
+      "sha256": "d996a47acaead8e8cd821ee9d79bce7bad6e46c51d95284674c1ea7a86757b9a",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/02__exit_phone_room.mp4",
+      "sha256": "3e5d649e2db2e5362b8092796df9ee44c475be46b7bf71f22c5f9bcb1f24b287",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/11__walking_down_street_outside_angry.mp4",
+      "sha256": "77d3219ed77f9a70f7c79f2168b47d42b5aeeb39418c56cea253921b9dcd976f",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/10__kitchen_still.mp4",
+      "sha256": "61268206001a20a8b5ffad82db49a716cd5898599d71441111d77e4fcd715886",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/02__hugging_happy.mp4",
+      "sha256": "d4c45d825d27d06099450a2260d13d609a103ae3767bd0c273f4813c7682408a",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/12__walking_down_street_outside_angry.mp4",
+      "sha256": "7c42c6c832e943bd600fae28b761eb657317ba909df8fe45a19faec07ae6790c",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/02__outside_talking_still_laughing.mp4",
+      "sha256": "a7c333031d0ef0b661da707093f9a0c45c44e7cc78a3ba476fa6ccb9a1e1aeaf",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/11__outside_talking_pan_laughing.mp4",
+      "sha256": "950dd46b4cee069a00b1552529d59641532a1df5f35f552b9db248a9dbb6f759",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/12__talking_against_wall.mp4",
+      "sha256": "239562ff3aaee4da99b5afacaa4749ec97787ee2d955dec44c07c91c8e61752f",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/01__walk_down_hall_angry.mp4",
+      "sha256": "2899bccb08e2e76cfac5a2616441ab98506866dcfd71d6df692f921ae3639482",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/05__walking_down_street_outside_angry.mp4",
+      "sha256": "9096dcdae2c63d0f1a6d63bb83a657079df75b92547c106491f5ef3e41db54fe",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/12__kitchen_pan.mp4",
+      "sha256": "1c01a624585ab838ea7010848272259aefadf157b5a7fe4d06ddc7a255685646",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/13__walking_outside_cafe_disgusted.mp4",
+      "sha256": "d5ea33f640fb6a762d896cd26ce81e16a1022b039fb810a8980f2f2086add365",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/06__podium_speech_happy.mp4",
+      "sha256": "719f49698458abfa2ff25eb617ff03c5e56ddea51d912d65fbfa44c3db94768a",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/14__walk_down_hall_angry.mp4",
+      "sha256": "57673523ccfeae1faeea22399e448fd72b1b1dddc130d8f9892d0cf56e815932",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/15__kitchen_still.mp4",
+      "sha256": "cd1d26ba3b6d0de724706202c15fe626c82f1ba4794888d5de1ba8d46e18a203",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/05__walk_down_hall_angry.mp4",
+      "sha256": "7827d36128e4233ea13b5676b3aa60e690059f14b2baf97994b40b7117e4b808",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/14__exit_phone_room.mp4",
+      "sha256": "535cd2dbcc555bb620054f2d8b1c505485d4a595dd087ef5e8bc64f89dd1addc",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/04__outside_talking_pan_laughing.mp4",
+      "sha256": "41c91b04015fde730bed130d462c688682c4fc0787cab9dfbbcc1fd09c0369e1",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/09__walking_down_street_outside_angry.mp4",
+      "sha256": "5b3b3d9a943affe021939b4731887224ece8b31252ea03d63d5e025da3c18a7d",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "real/11__talking_against_wall.mp4",
+      "sha256": "059e2b7b92a0839b3abaaf2fd5018ff36edb2ea2f6c038d8c47cb173279446c8",
+      "label": 0,
+      "label_name": "real",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/07_21__exit_phone_room__K7KXUHMU.mp4",
+      "sha256": "8a775ff2e8ffeab18f1e3a16d09281963e5f41e87c3ab7007a3b199998c6dd6e",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/01_03__talking_against_wall__JZUXXFRB.mp4",
+      "sha256": "9bab41445243f605986a6dca5502791584dac70345dce28ffb612c6872e86618",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/06_12__podium_speech_happy__0VR4Y891.mp4",
+      "sha256": "6fb53224ddeed050cd6b8d33c1fc89f315a1902c1538e3d24a703d36c0c8e401",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/02_03__walking_outside_cafe_disgusted__QH3Y0IG0.mp4",
+      "sha256": "431acbc9cef1472239cbd969cf7c4467c2f57ae6f436da8421ef84922d03e5b7",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/01_02__walk_down_hall_angry__YVGY8LOK.mp4",
+      "sha256": "2a0882fc4a09c0ec3b18580e0f0d292b235dd1f12ada6dad76a0181a9ed20d1b",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/03_18__walking_and_outside_surprised__8HNSXOBW.mp4",
+      "sha256": "13eab2a4ef9390372baa21eb6dd4b9bc062e05c95efa05ba191f54b42b254a5e",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/02_15__exit_phone_room__I8G2LWD1.mp4",
+      "sha256": "a269a223f0eec4d6a7414fc53491d9b3c7ec56cafcd3f78dfd584d8ca7838645",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/09_01__walk_down_hall_angry__6TSGVLHA.mp4",
+      "sha256": "b5573a1c6b26017d01bac894fddcd17b616cbcacd66ccb29d1ad6230fdc02b7c",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/06_02__walk_down_hall_angry__37DH75GQ.mp4",
+      "sha256": "250da5b20def35eadcd2e11d193901fcf72994eac93cbc04c6a67deddd81cfac",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/07_20__outside_talking_pan_laughing__KV6Q7D6C.mp4",
+      "sha256": "504c4d13a55c47d9af6b6edf23767e906b3f6e923dd7f2f61616b58bf13748ca",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/04_01__exit_phone_room__0XUW13RW.mp4",
+      "sha256": "83747b386974ef62fa7cb554347678f8d166adda04e3c1bebb1631771dca60ac",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/02_15__talking_angry_couch__HTG660F8.mp4",
+      "sha256": "791990fa3bf55b3b75feeab73117cf4b439f9566284d5f46f5d54997d7dbf7f8",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/01_27__hugging_happy__ZYCZ30C0.mp4",
+      "sha256": "b9c5a59e42a74aba55511db8ae92b372c857d8013d14bca1cffdd6d86e62696f",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/02_06__podium_speech_happy__N8OSN8P6.mp4",
+      "sha256": "391aebf0ea9f7c0dca199b5f8f97f2fa8e900e32f3f4a81632a753bfa09952bf",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/07_02__talking_angry_couch__1H07DFQJ.mp4",
+      "sha256": "682b9f54bfb8e0feec190a67c2c01495f6b8b01010c7bc5afae29c59c1172f56",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/06_07__walking_down_street_outside_angry__NMGYPBXE.mp4",
+      "sha256": "f228c99ee55cac7fc6bc014e1069679449517a08e234d2ebb209790fe82639bd",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/02_15__talking_against_wall__HTG660F8.mp4",
+      "sha256": "3f522a1916d9635945bb3b62bdefceac2bf79487caa34c897d1f9027cbf9159f",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/09_03__talking_against_wall__8DTEGQ54.mp4",
+      "sha256": "24f34865898da6386ed2d9d752b737d9849034404237e237a22178de82359471",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/06_20__kitchen_pan__6SUW7063.mp4",
+      "sha256": "6317f22f5952ae7922e709a298b1cad549c267d0a1371e99512777c7072b9b31",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/02_27__walk_down_hall_angry__78M8S6M6.mp4",
+      "sha256": "6b17d797fc8037a8ad3b356ecfcdf3c635a6e6c6fcf502d5dde6a5ec01011eb4",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/09_20__talking_angry_couch__0IRM5ADD.mp4",
+      "sha256": "79d179a4aaaa03c81f8e61761f3c26f223c0a56f2579553b4537cda133ef66cf",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/01_11__secret_conversation__4OJNJLOO.mp4",
+      "sha256": "958beca76037165231a30349e28c41ace287b30df1ea3c4c3a0351faf8d205ad",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/03_21__kitchen_pan__YCSEBZO4.mp4",
+      "sha256": "fc5b02d2a5e27289d54bea6bf0966ffd49b64353c46cc1f2d80dba9a23b063da",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/02_09__exit_phone_room__HIH8YA82.mp4",
+      "sha256": "c922334605f2a2172d8ee6cf3585d1e234c3cc5139d4ac11d79dfce6a85ed3ad",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/06_15__exit_phone_room__QRCD27P8.mp4",
+      "sha256": "5c66d500417e2c0a525a25e66fce4fb07259bb27218f839cd83863ddf76b2363",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/08_28__outside_talking_pan_laughing__8BC35RFU.mp4",
+      "sha256": "6215cda669102ca1d9d38e6bd00141ef0e140eead136010e0149996b469c38e4",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/07_21__outside_talking_still_laughing__K7KXUHMU.mp4",
+      "sha256": "40137ed0ce71a5f4a7343a5acdfcacd757c81b689acc1a65713da2eeed46a3e1",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/03_14__walk_down_hall_angry__P1L5PF4I.mp4",
+      "sha256": "408c7b8655b03b3ce3d1d403181e80edc52d648cb3ba1a247424c3609bdc6429",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/05_17__hugging_happy__YTJYYDO9.mp4",
+      "sha256": "f3b241486b8b441e26d62b4035e4af4c9e2398a1fa8999d5a3986782be817b41",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/01_20__outside_talking_pan_laughing__OTGHOG4Z.mp4",
+      "sha256": "d4c018e4e0d855fcb62c44ee0a76087c705d13022d1eb2ed5371c3e0b0a697b2",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/04_13__secret_conversation__00T3UYOR.mp4",
+      "sha256": "b8aacef368e9e2abf33d3e4c839534e96ac781d80b694190db828a42769e44c6",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/03_11__exit_phone_room__P08VGHTA.mp4",
+      "sha256": "0acfa05686c2034d3347833b66c1c52b5812523dd08282ca7bcb35d8d27d2c50",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/10_22__kitchen_still__EHARPYBT.mp4",
+      "sha256": "f6ba95ca7d1b8cf00e4289680324a72bc67134d9523d137506aa79a44cc18415",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/02_15__walking_and_outside_surprised__HTG660F8.mp4",
+      "sha256": "236b1d9df993a3fa16492ebcb63ed846f6f5e93a9f6433ba8c0cfc7bb0fd952b",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/03_09__secret_conversation__RCETIXYL.mp4",
+      "sha256": "67887e6668b6ab5d747717300ad2377af0ffebde072e133778f05f37d5a09708",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/02_15__outside_talking_pan_laughing__SB6PMCO0.mp4",
+      "sha256": "e447254d3ce93b6ccbc368e6bd4be936220b71161140d6df473b095430628471",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/03_14__podium_speech_happy__Q9NSXM88.mp4",
+      "sha256": "633ce0f290dd0ff4bc125754ad51d718cc2452e18cdc9dfdcd0a3606cb1a6a86",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/07_13__walking_outside_cafe_disgusted__RVQCPCJF.mp4",
+      "sha256": "a8854bc3fda19dadc00e3b51536d7ae0510a04a7d3b395f98d5688e8e88f9ae8",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/05_28__exit_phone_room__U9LRLJ6N.mp4",
+      "sha256": "80ce047f9fefb6a575ef492349303b96b7b0c0249b7138e3a83b3d23941aa017",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/07_15__hugging_happy__9Z2MLKVX.mp4",
+      "sha256": "18501a3f5500165cb46b206e3b04fb37d1bed7d489002cf3523168ef5e6b5d8a",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/06_25__talking_angry_couch__MI9BDQ7M.mp4",
+      "sha256": "b8c0d4a9321ccf63684242ae4ab4432ed98cda84bf995671fa55781b9b5bd810",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/04_01__outside_talking_still_laughing__0XUW13RW.mp4",
+      "sha256": "c490aae27e5a5e5472efd92f0377dba58520fc0cf005726cf03a94aacdc51f90",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/03_21__meeting_serious__V53E3RVB.mp4",
+      "sha256": "2b84b03435fd73f46b1d39c3bdbb8d516939064e6d66dae30849203264fa3035",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/06_07__kitchen_pan__NMGYPBXE.mp4",
+      "sha256": "d02dd5bc148ac33cadb363dba985e7d108b280eb72b7bacc68b1660bad384cef",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/03_21__exit_phone_room__YCSEBZO4.mp4",
+      "sha256": "1a97402eac4f786adeae3c796c856678c02da2e0f8ce96c30eb23a567b30a758",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/06_27__walking_and_outside_surprised__O7L5Z9U8.mp4",
+      "sha256": "3419d32d6a03c203ad6a21c7075030fd45e2db658b1dbf086f9e4b08f0aaf806",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/05_28__kitchen_still__W3J028UG.mp4",
+      "sha256": "b7e7b7b6a9a3b4553f98b7e558f99b3d31e08f7b57feeb5ba418e2f0afd7957c",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/09_20__kitchen_pan__98NUQ3E6.mp4",
+      "sha256": "f6dba1ed9b96984c9651f690b07442c15043fbe74becca40da8d4ddaadb1c562",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/01_20__outside_talking_still_laughing__FW94AIMJ.mp4",
+      "sha256": "0f39e2928d5376291ce185de3f2678bdb668031f6b51780b649e7b8857a68051",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    },
+    {
+      "file_id": "fake/06_02__podium_speech_happy__N8OSN8P6.mp4",
+      "sha256": "fcf9b978f74eb64bbf99a22f79a803fe984fc4c83b7e5e25b50418bd478ad40f",
+      "label": 1,
+      "label_name": "fake",
+      "label_verification": "dataset-declared only; not independently verified"
+    }
+  ]
+}

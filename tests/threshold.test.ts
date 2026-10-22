@@ -27,9 +27,16 @@ describe('risk bands follow the model decision threshold', () => {
     respond(0.45, {});
     expect((await a.post('/api/scan/text').send({ text: 'hello world' })).body.risk).toBe('warning');
   });
-  it('summary: flagged excludes low and MOCK scans; highRisk only counts high', async () => {
+  it('keeps experimental scans in history without treating them as security alerts', async () => {
+    process.env.PG_TEXT_MODEL_URL = 'http://m.local/p';
+    respond(0.99, { threshold: 0.52, experimental: true, limitations: 'Experimental model.' });
+    const scan = await a.post('/api/scan/text').send({ text: 'experimental result' });
+    expect(scan.body.risk).toBe('high');
+    expect((await a.get('/api/scans')).body.scans[0].details.experimental).toBe(true);
+  });
+  it('summary: flagged excludes low, MOCK, and experimental scans; highRisk only counts high', async () => {
     const s = (await a.get('/api/summary')).body;
-    expect(s).toMatchObject({ totalScans: 4, flagged: 3, highRisk: 1, mockScans: 0 });
+    expect(s).toMatchObject({ totalScans: 5, flagged: 3, highRisk: 1, mockScans: 0, experimentalScans: 1 });
     expect(s.last24h).toMatchObject({ scans: 4, flagged: 3 });
   });
   it('GET /api/scans/:id returns one scan with its version, and only to its owner', async () => {
@@ -39,6 +46,14 @@ describe('risk bands follow the model decision threshold', () => {
     await b.post('/api/auth/login').send({ email: 'b@t.co', password: 'threshold-pass-2' });
     expect((await b.get(`/api/scans/${id}`)).status).toBe(404);
     expect((await a.get('/api/scans/99999')).status).toBe(404);
+  });
+  it('bounds invalid and oversized history pagination limits', async () => {
+    const uid = (db.prepare("SELECT id FROM users WHERE email='a@t.co'").get() as { id: number }).id;
+    const insert = db.prepare("INSERT INTO scans (user_id,kind,label,score,model,model_version,details,input_meta,created_at) VALUES (?, 'text','safe',0.1,'test','1','{}','{}','now')");
+    for (let i = 0; i < 205; i++) insert.run(uid);
+    expect((await a.get('/api/scans?limit=-1')).body.scans).toHaveLength(50);
+    expect((await a.get('/api/scans?limit=500')).body.scans).toHaveLength(200);
+    expect((await a.get('/api/scans?limit=NaN&before=Infinity')).body.scans).toHaveLength(50);
   });
   it('keeps a long limitations note but drops oversized or nested detail values', async () => {
     process.env.PG_TEXT_MODEL_URL = 'http://m.local/p';

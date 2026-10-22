@@ -13,16 +13,17 @@ const scan = (o: object) => ({ id: 1, kind: 'text', label: 'suspicious', score: 
 const REAL = scan({ id: 2 });
 const MOCKED = scan({ id: 3, label: 'MOCK result (not a real prediction)', model: 'MOCK-text-model-not-a-detector', version: 'mock-0', mock: true, details: { mock: true } });
 const SAFE = scan({ id: 4, label: 'safe', score: 0.02, risk: 'low' });
+const EXPERIMENTAL = scan({ id: 5, kind: 'audio', label: 'synthetic', model: 'pg-audio-experimental', details: { experimental: true, limitations: 'Not reliable.' }, input: { filename: 'call.wav' } });
 
 let authed = true, scans: object[] = [], advisor = true, expire = false;
 beforeEach(() => {
-  resetIntroForTests(); localStorage.clear(); authed = true; scans = [REAL, MOCKED, SAFE]; advisor = true; expire = false;
+  resetIntroForTests(); localStorage.clear(); authed = true; scans = [REAL, MOCKED, SAFE, EXPERIMENTAL]; advisor = true; expire = false;
   vi.stubGlobal('fetch', vi.fn(async (url: string) => {
     if (url.endsWith('/health')) return json({ ok: true });
     if (expire && !url.endsWith('/auth/login')) return json({ error: 'unauthenticated', message: 'Please sign in.' }, 401);
     if (url.endsWith('/auth/me')) return authed ? json({ user: { email: 'a@b.co', name: 'Alex' } }) : json({ error: 'unauthenticated', message: 'x' }, 401);
     if (url.endsWith('/status')) return json({ demo: false, models: { text: true, audio: false, video: false, advisor }, limits: { text: 20000, audio: { bytes: 1, exts: ['wav'], maxSeconds: 300 }, video: { bytes: 1, exts: ['mp4'] } } });
-    if (url.endsWith('/summary')) return json({ totalScans: 3, mockScans: 1, highRisk: 1, flagged: 1, lastScanAt: REAL.createdAt, last24h: { scans: 2, maxScore: 0.93, flagged: 1 } });
+    if (url.endsWith('/summary')) return json({ totalScans: 4, mockScans: 1, experimentalScans: 1, highRisk: 1, flagged: 1, lastScanAt: REAL.createdAt, last24h: { scans: 2, maxScore: 0.93, flagged: 1 } });
     if (/\/scans\/\d+\/report$/.test(url)) return json({ id: 2, label: 'suspicious', model: 'pg-text-tfidf-logreg' });
     if (url.includes('/scans')) return json({ scans });
     return json({}, 404);
@@ -33,10 +34,11 @@ afterEach(() => vi.unstubAllGlobals());
 const open = async (path: string) => { render(<MemoryRouter initialEntries={[path]}><App /></MemoryRouter>); await userEvent.keyboard('{Escape}'); };
 
 describe('history, alerts and details', () => {
-  it('alerts list only genuine flagged scans (no MOCK, no low risk) and open a detail view', async () => {
+  it('alerts list only non-experimental flagged scans (no MOCK, no experimental, no low risk)', async () => {
     await open('/alerts');
     expect(await screen.findByText('All (1)')).toBeInTheDocument();
     expect(screen.queryByText(/MOCK result/)).toBeNull();
+    expect(screen.queryByText('synthetic')).toBeNull();
     await userEvent.click(await screen.findByRole('button', { name: /suspicious/i }));
     const d = await screen.findByRole('dialog', { name: 'Scan details' });
     expect(within(d).getByText('Trained model')).toBeInTheDocument();
@@ -50,11 +52,32 @@ describe('history, alerts and details', () => {
     await open('/activity');
     const items = await screen.findAllByRole('button', { name: /scan/i });
     expect(items.length).toBeGreaterThanOrEqual(3);
+    expect(screen.getAllByText('EXPERIMENTAL').length).toBeGreaterThan(0);
     const mockRow = items.find((b) => /MOCK/.test(b.textContent ?? ''))!;
     await userEvent.click(mockRow);
     const d = await screen.findByRole('dialog', { name: 'Scan details' });
     expect(within(d).getByRole('note')).toHaveTextContent(/MOCK \/ DEMO RESULT/);
     expect(within(d).queryByText('Trained model')).toBeNull();
+  });
+
+  it('experimental scan details retain the warning and never present an experimental risk badge', async () => {
+    await open('/activity');
+    const row = await screen.findByRole('button', { name: /voice recording scan/i });
+    expect(row).toHaveTextContent('EXPERIMENTAL');
+    await userEvent.click(row);
+    const d = await screen.findByRole('dialog', { name: 'Scan details' });
+    expect(within(d).getByRole('note')).toHaveTextContent(/experimental detector — do not rely/i);
+    expect(within(d).getByText('Experimental model')).toBeInTheDocument();
+    expect(within(d).queryByText('High risk')).toBeNull();
+  });
+
+  it('the Flagged activity filter excludes experimental and MOCK results', async () => {
+    await open('/activity');
+    await screen.findAllByRole('button', { name: /scan/i });
+    await userEvent.click(screen.getByRole('button', { name: 'Flagged' }));
+    expect(await screen.findAllByRole('button', { name: /scan/i })).toHaveLength(1);
+    expect(screen.queryByText('EXPERIMENTAL')).toBeNull();
+    expect(screen.queryByText(/MOCK result/)).toBeNull();
   });
 
   it('report dialog shows the report and the history entry created by the Android back button closes it', async () => {

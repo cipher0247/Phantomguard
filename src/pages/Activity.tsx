@@ -6,7 +6,8 @@ import { APP_RESUME, Card, ErrorNote, Icon, kindIcon, kindName, RiskBadge, Spinn
 const PAGE = 25;
 const FILTERS = [['all', 'All Telemetry'], ['flagged', 'Flagged'], ['audio', 'Voice AI'], ['video', 'Video'], ['text', 'Text']] as const;
 const day = (iso: string) => new Date(iso).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
-const verdict = (s: Scan) => (s.mock ? ['MOCK', 'text-on-surface-variant'] : s.risk === 'high' ? ['FLAGGED', 'text-error'] : s.risk === 'warning' ? ['REVIEW', 'text-primary'] : ['CLEAR', 'text-on-surface-variant']);
+const experimental = (s: Scan) => !s.mock && s.details.experimental === true;
+const verdict = (s: Scan) => (s.mock ? ['MOCK', 'text-on-surface-variant'] : experimental(s) ? ['EXPERIMENTAL', 'text-error'] : s.risk === 'high' ? ['FLAGGED', 'text-error'] : s.risk === 'warning' ? ['REVIEW', 'text-primary'] : ['CLEAR', 'text-on-surface-variant']);
 
 export function Activity() {
   const sum = useAsync(api.summary);
@@ -27,7 +28,7 @@ export function Activity() {
   useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [f]);
   useEffect(() => { const again = () => void load(); window.addEventListener(APP_RESUME, again); return () => window.removeEventListener(APP_RESUME, again); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [f]);
 
-  const shown = f === 'flagged' ? scans.filter((s) => !s.mock && s.risk !== 'low') : scans;
+  const shown = f === 'flagged' ? scans.filter((s) => !s.mock && !experimental(s) && s.risk !== 'low') : scans;
   const groups = shown.reduce<Record<string, Scan[]>>((g, s) => ((g[day(s.createdAt)] ??= []).push(s), g), {});
   const stat = 'rounded-xl bg-surface-container-low border border-outline-variant/40 p-4';
 
@@ -50,13 +51,13 @@ export function Activity() {
             <div className="flex items-start gap-3">
               <span className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary shrink-0"><Icon name={kindIcon[s.kind]} /></span>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap"><h3 className="font-headline text-base font-semibold">{kindName[s.kind]} scan</h3>{s.mock ? <MockBadge /> : <RiskBadge risk={s.risk}>{riskLabel(s)}</RiskBadge>}</div>
+                <div className="flex items-center gap-2 flex-wrap"><h3 className="font-headline text-base font-semibold">{kindName[s.kind]} scan</h3>{s.mock ? <MockBadge /> : experimental(s) ? <span className="text-xs px-2 py-0.5 rounded font-bold bg-error-container text-error">EXPERIMENTAL</span> : <RiskBadge risk={s.risk}>{riskLabel(s)}</RiskBadge>}</div>
                 <p className="text-xs text-on-surface-variant mt-0.5 truncate">{s.input.filename ? String(s.input.filename) : `${s.input.chars ?? '?'} characters`} • {s.model}</p>
               </div>
               <time className="text-xs text-on-surface-variant" dateTime={s.createdAt}>{new Date(s.createdAt).toLocaleTimeString(undefined, { timeStyle: 'short' })}</time>
             </div>
             <div className="mt-3 flex items-center justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-sm">
-              <span className="capitalize">{s.label} ({pct(s.score)}/100)</span><span className={`text-xs font-bold ${c}`}>{v}</span>
+              <span className="capitalize">{s.label} ({experimental(s) ? 'model score ' : ''}{pct(s.score)}/100)</span><span className={`text-xs font-bold ${c}`}>{v}</span>
             </div>
           </button>); })}
       </section>))}

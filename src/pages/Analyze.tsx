@@ -11,27 +11,34 @@ const GUIDANCE = ['Do not click links or open attachments in the message.', 'Con
 
 function Result({ scan }: { scan: Scan }) {
   const tone = scan.mock ? 'bg-surface-container-low' : scan.risk === 'high' ? 'bg-error-container/50' : scan.risk === 'warning' ? 'bg-primary-fixed/50' : 'bg-surface-container-low';
-  const details = Object.entries(scan.details ?? {}).filter(([k, v]) => k !== 'limitations' && ['string', 'number', 'boolean'].includes(typeof v));
+  const experimental = scan.details?.experimental === true;
+  const details = Object.entries(scan.details ?? {}).filter(([k, v]) => !['limitations', 'experimental'].includes(k) && ['string', 'number', 'boolean'].includes(typeof v));
   const limitations = typeof scan.details?.limitations === 'string' ? scan.details.limitations : null;
   return (<>
     {scan.mock && <MockNotice />}
     <Card className={`${tone} flex items-center gap-4`} >
-      <div className="w-20 h-20 shrink-0 rounded-xl bg-surface-container-lowest flex flex-col items-center justify-center" aria-label={`Score ${pct(scan.score)} out of 100`}>
+      <div className="w-20 h-20 shrink-0 rounded-xl bg-surface-container-lowest flex flex-col items-center justify-center" aria-label={`${experimental ? 'Experimental model score' : 'Score'} ${pct(scan.score)} out of 100`}>
         <span className="font-headline text-3xl font-semibold text-primary">{pct(scan.score)}</span><span className="text-xs text-on-surface-variant">/100</span>
       </div>
       <div className="min-w-0 flex-1">
-        <div className="flex gap-2 items-center flex-wrap">{scan.mock ? <MockBadge /> : <><span className="text-xs px-2 py-0.5 rounded font-label font-bold bg-primary text-on-primary tracking-wider">TRAINED MODEL</span><RiskBadge risk={scan.risk}>{riskLabel(scan)}</RiskBadge></>}</div>
+        <div className="flex gap-2 items-center flex-wrap">{scan.mock ? <MockBadge /> : <><span className={`text-xs px-2 py-0.5 rounded font-label font-bold tracking-wider ${experimental ? 'bg-error text-on-error' : 'bg-primary text-on-primary'}`}>{experimental ? 'EXPERIMENTAL MODEL' : 'TRAINED MODEL'}</span>{!experimental && <RiskBadge risk={scan.risk}>{riskLabel(scan)}</RiskBadge>}</>}</div>
         <h3 className="font-headline text-xl mt-1 break-words capitalize">{scan.label}</h3>
         <p className="text-xs text-on-surface-variant mt-1">Model: {scan.model} (v{scan.version})</p>
       </div>
       <ReportButton id={scan.id} className="shrink-0" />
     </Card>
+    {experimental && <Card className="border-2 border-error bg-error-container/40">
+      <h4 className="text-sm uppercase tracking-widest text-error font-bold mb-2">Experimental detector — do not rely on this result</h4>
+      <p className="text-sm text-on-surface-variant">{limitations ?? 'This model has not been validated for reliable real-world decisions.'}</p>
+    </Card>}
     <Card>
       <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">How to read this</h4>
       {scan.mock
         ? <p className="text-sm text-on-surface-variant">This score is a deterministic placeholder from a test stub (it only reflects message length). It carries no information about whether the message is a scam.</p>
-        : <><p className="text-sm text-on-surface-variant">{scan.limitation ?? 'The score is a probability estimate from a trained model, not proof.'} Higher means the model considers the input more likely to be malicious or synthetic.</p>
-          {limitations && <p className="text-sm text-on-surface-variant mt-2"><span className="font-semibold">Known limits: </span>{limitations}</p>}</>}
+        : <><p className="text-sm text-on-surface-variant">{experimental
+          ? 'This is an uncalibrated model output scaled to 0–100 for display, not a probability. The threshold shown below determines the displayed label.'
+          : `${scan.limitation ?? 'Model output is not proof.'} Higher means the model assigns more of its configured positive-class score.`}</p>
+          {limitations && !experimental && <p className="text-sm text-on-surface-variant mt-2"><span className="font-semibold">Known limits: </span>{limitations}</p>}</>}
       {details.length > 0 && <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">{details.map(([k, v]) => <div key={k} className="rounded-lg bg-surface-container-lowest p-3"><dt className="text-on-surface-variant uppercase tracking-wider">{k.replace(/_/g, ' ')}</dt><dd className="font-semibold mt-0.5 break-words">{String(v)}</dd></div>)}</dl>}
     </Card>
     {scan.risk !== 'low' && !scan.mock && <Card>
@@ -53,6 +60,7 @@ export function Analyze() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<Scan | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const abort = useRef<AbortController | null>(null);
   const limits = status.data?.limits;
   const available = status.data?.models[tab];
 
@@ -69,9 +77,9 @@ export function Analyze() {
     setBusy(true); setError(''); setResult(null); setProgress(null);
     try {
       if (tab === 'text') setResult(await api.scanText(text));
-      else if (file) { setProgress(0); setResult(await api.scanFile(tab, file, setProgress)); }
-    } catch (e) { setError((e as Error).message); }
-    finally { setBusy(false); setProgress(null); }
+      else if (file) { abort.current = new AbortController(); setProgress(0); setResult(await api.scanFile(tab, file, setProgress, abort.current.signal)); }
+    } catch (e) { if ((e as { code?: string }).code !== 'cancelled') setError((e as Error).message); }
+    finally { setBusy(false); setProgress(null); abort.current = null; }
   };
   const ready = tab === 'text' ? text.trim().length > 0 && text.length <= (limits?.text ?? 20000) : !!file;
 
@@ -108,7 +116,8 @@ export function Analyze() {
       {error && <div className="mt-4"><ErrorNote message={error} /></div>}
       {progress !== null && <div className="mt-4" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Upload progress">
         <div className="h-2 rounded-full bg-surface-container-high overflow-hidden"><div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} /></div>
-        <p className="text-xs text-on-surface-variant mt-1">{progress < 100 ? `Uploading ${progress}%` : 'Analysing…'}</p></div>}
+        <div className="flex items-center justify-between gap-3 mt-1"><p className="text-xs text-on-surface-variant" role="status">{progress < 100 ? `Uploading ${progress}%` : tab === 'video' ? 'Analysing frames… this can take up to a minute.' : 'Analysing…'}</p>
+          <button type="button" onClick={() => abort.current?.abort()} className="min-h-[44px] px-3 text-xs font-semibold text-primary underline underline-offset-4">Cancel</button></div></div>}
       <button onClick={run} disabled={busy || !ready || !available}
         className="mt-4 w-full min-h-[48px] rounded-xl bg-primary text-on-primary text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-primary-container">
         <Icon name={busy ? 'progress_activity' : 'bolt'} className={busy ? 'animate-spin' : ''} />{busy ? 'Scanning…' : 'Execute scan'}</button>

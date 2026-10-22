@@ -22,7 +22,7 @@ beforeEach(() => {
     }
     if (url.endsWith('/auth/logout')) { authed = false; return json({ ok: true }); }
     if (url.endsWith('/status')) return json({ demo: false, models: { text: false, audio: false, video: false, advisor: false }, limits: { text: 20000, audio: { bytes: 1, exts: ['wav'], maxSeconds: 300 }, video: { bytes: 1, exts: ['mp4'] } } });
-    if (url.endsWith('/summary')) return json({ totalScans: 0, mockScans: 0, highRisk: 0, lastScanAt: null, last24h: { scans: 0, maxScore: null } });
+    if (url.endsWith('/summary')) return json({ totalScans: 0, mockScans: 0, experimentalScans: 0, highRisk: 0, flagged: 0, lastScanAt: null, last24h: { scans: 0, maxScore: null, flagged: 0 } });
     if (url.includes('/scans')) return json({ scans: [] });
     return json({}, 404);
   }));

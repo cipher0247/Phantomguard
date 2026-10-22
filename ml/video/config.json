@@ -1,0 +1,17 @@
+{
+  "model": "pg-video-communityforensics-vit",
+  "version": "0.1.0-experimental",
+  "threshold": 0.03,
+  "model_sha256": "275ba982236ddd6afddf7131f8133e89f537574b964cf8fa5825b4956d741692",
+  "output": "sigmoid",
+  "fake_index": 0,
+  "labels": {
+    "positive": "manipulated",
+    "negative": "not flagged"
+  },
+  "backbone": {
+    "id": "buildborderless/CommunityForensics-DeepfakeDet-ViT",
+    "revision": "ac6ee457bea904a373065754107451793b56db00"
+  },
+  "limitations": "EXPERIMENTAL: On 100 evaluation clips of unknown provenance, ROC-AUC was 0.559. At threshold 0.5, fake recall was 0%; the 0.03 threshold was selected on this same sample and is optimistically biased (58% accuracy). This is not a reliable deepfake detector; do not use its result to decide whether to trust a person or video."
+}

@@ -22,16 +22,13 @@ Accepting the Android SDK licences is a manual step that cannot be automated on 
 
 ## 2. Start the backend on your PC
 
-```bash
+```powershell
 npm install
 npm run demo:setup                 # creates demo@phantomguard.local with a NEW random password, printed once (local only)
-npm run mock:text                  # (terminal 2) MOCK text service on :9001; NOT a detector
+powershell -ExecutionPolicy Bypass -File scripts\start-all.ps1
 ```
-```powershell
-# terminal 3 (PowerShell): demo mode shows a banner and sample messages; results are labelled MOCK
-$env:PG_DEMO_MODE = "1"; $env:PG_TEXT_MODEL_URL = "http://127.0.0.1:9001/predict"
-npm run build; npm start           # listens on 0.0.0.0:8787
-```
+
+The launcher starts configured model services and waits for health checks before starting the backend on `0.0.0.0:8787`. It uses the experimental audio/video detectors described in `ml/README.md`; the app marks their results as experimental because their measured performance is weak. It does not enable mock text results unless you explicitly pass `-Mock`.
 
 Without `PG_TEXT_MODEL_URL` the text screen reports "not configured" honestly. Demo mode refuses to start with `NODE_ENV=production`, and `demo:setup` refuses to run in production; the server also refuses to start in production while any `@phantomguard.local` account exists. Remove the demo account afterwards: `npm run delete-user -- demo@phantomguard.local`.
 
@@ -73,15 +70,15 @@ Permissions: only `INTERNET`. File uploads use Android's system file picker (no 
 4. Analyze → Text → tap a **Demo sample** → Execute scan. The result carries a **MOCK / DEMO RESULT** notice. The score only reflects message length; say so.
 5. Open **View report**, then Alerts (mock results are never alerts) and Activity (history shows MOCK entries).
 6. AI Advisor: without `ANTHROPIC_API_KEY` it says it is not configured; with a key, replies are labelled AI-generated.
-7. Voice and Video tabs: show the honest "model is not configured" message. Profile: service status and privacy notes.
+7. Voice and Video tabs: uploads reach the experimental models; each result carries a prominent warning and limitations. Do not use the scores to make safety decisions. Profile: service status and privacy notes.
 
 ## 6. What is real vs. demo
 
 | | State |
 |---|---|
 | Sign-in, sessions, history, reports, upload validation, connectivity status | Real |
-| Text scan | Real only if you run a genuine model service at `PG_TEXT_MODEL_URL`; the bundled mock is labelled MOCK everywhere and excluded from risk figures |
-| Audio, video | No model: "not configured" |
-| Advisor | Real only with an API key; labelled AI-generated |
+| Text scan | Real only if you run a genuine model service at `PG_TEXT_MODEL_URL`; the optional bundled mock is labelled MOCK everywhere and excluded from risk figures |
+| Audio, video | Experimental pretrained checkpoints; both have near-chance evaluation results and must not be trusted for decisions |
+| Advisor | Real only with `GEMINI_API_KEY` or `ANTHROPIC_API_KEY`; labelled AI-generated |
 
 Not verified: physical-device or emulator testing of the APK. The web build was checked at 360 px width in a desktop browser.

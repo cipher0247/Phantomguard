@@ -1,0 +1,97 @@
+{
+  "model": "MelodyMachine/Deepfake-audio-detection-V2",
+  "dataset": "garystafford/deepfake-audio-detection (CC-BY-4.0)",
+  "n": 80,
+  "threshold": 0.5,
+  "accuracy": 0.5625,
+  "roc_auc": 0.516441005802708,
+  "tn": 43,
+  "fp": 4,
+  "fn": 31,
+  "tp": 2,
+  "real_specificity": 0.9148936170212766,
+  "fake_recall": 0.06060606060606061,
+  "by_group": {
+    "fake:el": {
+      "n": 3,
+      "fake_prob_mean": 0.33643958597470675,
+      "flagged_fraction": 0.3333333333333333
+    },
+    "fake:hu": {
+      "n": 4,
+      "fake_prob_mean": 0.25000548313937543,
+      "flagged_fraction": 0.25
+    },
+    "fake:lv": {
+      "n": 5,
+      "fake_prob_mean": 0.00013342261590878479,
+      "flagged_fraction": 0.0
+    },
+    "fake:po": {
+      "n": 13,
+      "fake_prob_mean": 3.283369943136886e-05,
+      "flagged_fraction": 0.0
+    },
+    "fake:sp": {
+      "n": 8,
+      "fake_prob_mean": 1.7119612948590657e-05,
+      "flagged_fraction": 0.0
+    },
+    "real:yt_0000": {
+      "n": 4,
+      "fake_prob_mean": 1.6863687960722018e-05,
+      "flagged_fraction": 0.0
+    },
+    "real:yt_0002": {
+      "n": 1,
+      "fake_prob_mean": 1.7308850146946497e-05,
+      "flagged_fraction": 0.0
+    },
+    "real:yt_0003": {
+      "n": 1,
+      "fake_prob_mean": 1.6816911738715135e-05,
+      "flagged_fraction": 0.0
+    },
+    "real:yt_0005": {
+      "n": 1,
+      "fake_prob_mean": 1.6833404515637085e-05,
+      "flagged_fraction": 0.0
+    },
+    "real:yt_0006": {
+      "n": 3,
+      "fake_prob_mean": 0.6666491281321214,
+      "flagged_fraction": 0.6666666666666666
+    },
+    "real:yt_0008": {
+      "n": 8,
+      "fake_prob_mean": 0.12501194127798954,
+      "flagged_fraction": 0.125
+    },
+    "real:yt_0009": {
+      "n": 10,
+      "fake_prob_mean": 1.937780816660961e-05,
+      "flagged_fraction": 0.0
+    },
+    "real:yt_0010": {
+      "n": 2,
+      "fake_prob_mean": 0.01645517529868812,
+      "flagged_fraction": 0.0
+    },
+    "real:yt_0011": {
+      "n": 3,
+      "fake_prob_mean": 1.6901571749864768e-05,
+      "flagged_fraction": 0.0
+    },
+    "real:yt_0012": {
+      "n": 10,
+      "fake_prob_mean": 0.09841509322268394,
+      "flagged_fraction": 0.1
+    },
+    "real:yt_0013": {
+      "n": 4,
+      "fake_prob_mean": 1.6807395695650484e-05,
+      "flagged_fraction": 0.0
+    }
+  },
+  "partial": true
+}

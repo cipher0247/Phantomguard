@@ -110,7 +110,8 @@ const label = (k: string) => k.replace(/_/g, ' ');
 
 /** Full detail of one stored analysis. Used by Home, Alerts and Activity. */
 export function ScanDetailDialog({ scan, onClose }: { scan: Scan; onClose: () => void }) {
-  const details = Object.entries(scan.details ?? {}).filter(([k, v]) => k !== 'limitations' && ['string', 'number', 'boolean'].includes(typeof v));
+  const experimental = !scan.mock && scan.details?.experimental === true;
+  const details = Object.entries(scan.details ?? {}).filter(([k, v]) => !['limitations', 'experimental'].includes(k) && ['string', 'number', 'boolean'].includes(typeof v));
   const limitation = typeof scan.details?.limitations === 'string' ? scan.details.limitations : scan.limitation;
   const input = Object.entries(scan.input ?? {});
   return (
@@ -120,18 +121,26 @@ export function ScanDetailDialog({ scan, onClose }: { scan: Scan; onClose: () =>
         <div className="min-w-0 flex-1">
           <h2 className="font-headline text-2xl break-words">{scan.label}</h2>
           <div className="flex gap-2 items-center flex-wrap mt-1">
-            {scan.mock ? <MockBadge /> : <RiskBadge risk={scan.risk}>{riskLabel(scan)}</RiskBadge>}
+            {scan.mock ? <MockBadge /> : experimental ? <span className="text-xs px-2 py-0.5 rounded font-bold bg-error text-on-error">EXPERIMENTAL MODEL</span> : <RiskBadge risk={scan.risk}>{riskLabel(scan)}</RiskBadge>}
             <span className="text-xs text-on-surface-variant">{kindName[scan.kind]} • {new Date(scan.createdAt).toLocaleString()}</span>
           </div>
         </div>
       </div>
       {scan.mock && <div className="mt-4"><MockNotice /></div>}
+      {experimental && <div role="note" className="mt-4 rounded-xl border-2 border-error bg-error-container/50 px-4 py-3">
+        <h3 className="text-sm font-bold text-error">Experimental detector — do not rely on this result</h3>
+        <p className="mt-1 text-sm text-on-surface-variant">{limitation ?? 'This model has not been validated for reliable real-world decisions.'}</p>
+      </div>}
       <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-        <div className="rounded-lg bg-surface-container-lowest p-3"><div className="uppercase tracking-wider text-on-surface-variant">Score</div><div className="font-headline text-2xl font-semibold mt-0.5">{pct(scan.score)}<span className="text-sm text-on-surface-variant">/100</span></div></div>
-        <div className="rounded-lg bg-surface-container-lowest p-3"><div className="uppercase tracking-wider text-on-surface-variant">{scan.mock ? 'Source' : 'Trained model'}</div><div className="font-semibold mt-0.5 break-words">{scan.model}</div><div className="text-on-surface-variant">v{scan.version}</div></div>
+        <div className="rounded-lg bg-surface-container-lowest p-3"><div className="uppercase tracking-wider text-on-surface-variant">{experimental ? 'Experimental model score' : 'Score'}</div><div className="font-headline text-2xl font-semibold mt-0.5">{pct(scan.score)}<span className="text-sm text-on-surface-variant">/100</span></div></div>
+        <div className="rounded-lg bg-surface-container-lowest p-3"><div className="uppercase tracking-wider text-on-surface-variant">{scan.mock ? 'Source' : experimental ? 'Experimental model' : 'Trained model'}</div><div className="font-semibold mt-0.5 break-words">{scan.model}</div><div className="text-on-surface-variant">v{scan.version}</div></div>
         {[...input, ...details].map(([k, v]) => <div key={k} className="rounded-lg bg-surface-container-lowest p-3"><div className="uppercase tracking-wider text-on-surface-variant">{label(k)}</div><div className="font-semibold mt-0.5 break-words">{String(v)}</div></div>)}
       </div>
-      <p className="mt-4 text-sm text-on-surface-variant">{scan.mock ? 'This score comes from a test stub and says nothing about the content.' : limitation ?? 'A model score is a probability estimate, not proof.'}</p>
+      <p className="mt-4 text-sm text-on-surface-variant">{scan.mock
+        ? 'This score comes from a test stub and says nothing about the content.'
+        : experimental
+          ? 'This is an uncalibrated model output, not a probability. The configured threshold determines the displayed label.'
+          : limitation ?? 'Model output is not proof.'}</p>
       <div className="flex gap-2 mt-4 items-center">
         <ReportButton id={scan.id} />
         <button onClick={onClose} autoFocus className="ml-auto min-h-[48px] px-6 rounded-xl bg-primary text-on-primary text-sm font-semibold">Close</button>

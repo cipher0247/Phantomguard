@@ -4,8 +4,7 @@ import { api, riskLabel, pct, type Scan } from '../api';
 import { ScanDetailDialog } from '../components';
 import { Card, ErrorNote, Icon, kindIcon, kindName, RiskBadge, Spinner, timeAgo, useAsync } from '../ui';
 
-// An alert is a genuine (non-MOCK) analysis the model flagged. "Flagged" is decided server-side from the model's own decision
-// threshold (risk = warning or high); 0.95+ is shown as Critical.
+// Experimental and MOCK results remain in history but are not presented as security alerts.
 const FILTERS = [
   ['all', 'All', () => true],
   ['critical', 'Critical', (s: Scan) => s.risk === 'high' && s.score >= 0.95],
@@ -17,7 +16,7 @@ export function Alerts() {
   const { data, loading, error, reload } = useAsync(() => api.scans({ limit: 200 }));
   const [f, setF] = useState<(typeof FILTERS)[number][0]>('all');
   const [open, setOpen] = useState<Scan | null>(null);
-  const alerts = (data ?? []).filter((s) => s.risk !== 'low' && !s.mock); // MOCK results are never alerts
+  const alerts = (data ?? []).filter((s) => s.risk !== 'low' && !s.mock && s.details.experimental !== true);
   const shown = alerts.filter(FILTERS.find((x) => x[0] === f)![2]);
 
   return (<>

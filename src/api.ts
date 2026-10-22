@@ -6,7 +6,7 @@ export interface Scan { mock: boolean; id: number; kind: Kind; label: string; sc
   input: Record<string, unknown>; createdAt: string; limitation?: string }
 export interface Status { models: Record<Kind | 'advisor', boolean>;
   demo: boolean; limits: { text: number; audio: { bytes: number; exts: string[]; maxSeconds: number }; video: { bytes: number; exts: string[] } } }
-export interface Summary { mockScans: number; totalScans: number; highRisk: number; flagged: number; lastScanAt: string | null; last24h: { scans: number; maxScore: number | null; flagged: number } }
+export interface Summary { mockScans: number; experimentalScans: number; totalScans: number; highRisk: number; flagged: number; lastScanAt: string | null; last24h: { scans: number; maxScore: number | null; flagged: number } }
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
@@ -60,12 +60,13 @@ export const api = {
   scanText: (text: string) => req<Scan>('/scan/text', json({ text }), 60_000),
   advisor: (messages: { role: 'user' | 'assistant'; content: string }[]) => req<{ reply: string }>('/advisor', json({ messages })).then((r) => r.reply),
   // XHR rather than fetch: fetch cannot report upload progress.
-  scanFile: (kind: 'audio' | 'video', file: File, onProgress: (pct: number) => void) => new Promise<Scan>((resolve, reject) => {
+  scanFile: (kind: 'audio' | 'video', file: File, onProgress: (pct: number) => void, signal?: AbortSignal) => new Promise<Scan>((resolve, reject) => {
     const x = new XMLHttpRequest(), fd = new FormData();
     fd.append('file', file);
     try { x.open('POST', endpoint(`/scan/${kind}`)); } catch (e) { return reject(e); }
     const t = getToken(); if (t) x.setRequestHeader('Authorization', `Bearer ${t}`);
-    x.timeout = 180_000; x.ontimeout = () => reject(new ApiError(0, 'timeout', 'The upload timed out. Try a smaller file or a faster connection.'));
+    signal?.addEventListener('abort', () => { x.abort(); reject(new ApiError(0, 'cancelled', 'Cancelled.')); }, { once: true });
+    x.timeout = 300_000; x.ontimeout = () => reject(new ApiError(0, 'timeout', 'The upload timed out. Try a smaller file or a faster connection.'));
     x.upload.onprogress = (e) => e.lengthComputable && onProgress(Math.round((e.loaded / e.total) * 100));
     x.onerror = () => reject(new ApiError(0, 'network', ABSENT));
     x.onload = () => {

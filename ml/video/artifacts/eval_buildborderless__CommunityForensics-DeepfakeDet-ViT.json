@@ -1,0 +1,33 @@
+{
+  "model": "buildborderless/CommunityForensics-DeepfakeDet-ViT",
+  "n_videos": 100,
+  "frames_per_video": 12,
+  "seconds": 799,
+  "aggregation": {
+    "mean": {
+      "roc_auc": 0.5592,
+      "acc_at_0_5": 0.5,
+      "best_threshold": 0.03,
+      "acc_at_best": 0.58,
+      "fake_recall_at_0_5": 0.0,
+      "real_specificity_at_0_5": 1.0
+    },
+    "median": {
+      "roc_auc": 0.5596,
+      "acc_at_0_5": 0.5,
+      "best_threshold": 0.05,
+      "acc_at_best": 0.57,
+      "fake_recall_at_0_5": 0.0,
+      "real_specificity_at_0_5": 1.0
+    },
+    "top3_mean": {
+      "roc_auc": 0.5616,
+      "acc_at_0_5": 0.51,
+      "best_threshold": 0.06,
+      "acc_at_best": 0.58,
+      "fake_recall_at_0_5": 0.06,
+      "real_specificity_at_0_5": 0.96
+    }
+  },
+  "note": "threshold-at-best is optimistic (tuned on this same sample). Indicative only."
+}

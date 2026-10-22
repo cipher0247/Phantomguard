@@ -58,7 +58,7 @@ describe('demo mode and mock labelling', () => {
     m.server.close();
     expect(r.body.mock).toBe(true); expect(r.body.risk).toBe('high');
     const s = (await request(app).get('/api/summary').set(auth)).body;
-    expect(s).toMatchObject({ mockScans: 1, highRisk: 0, last24h: { scans: 0, maxScore: null } });
+    expect(s).toMatchObject({ mockScans: 1, experimentalScans: 0, highRisk: 0, last24h: { scans: 0, maxScore: null } });
     expect((await request(app).get('/api/scans').set(auth)).body.scans[0].mock).toBe(true);
   });
 });
